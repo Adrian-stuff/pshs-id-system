@@ -1,113 +1,463 @@
-import Image from 'next/image'
+"use client";
+import {
+  ChangeEvent,
+  Dispatch,
+  KeyboardEvent,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { toBlob } from "html-to-image";
+import { zipAndDownloadImages, dataURItoBlob } from "./utils";
+
+import { useDataSheetStore, useIdValuesStore, useImageStore } from "./store";
+import { Stage, Layer, Text } from "react-konva";
+import Konva from "konva";
+import URLImage from "./UrlImage";
+import DataImport from "./DataImport";
+import { read, utils } from "xlsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import IDCanvas from "@/components/IDcanvas";
+import Sliders from "@/components/Sliders";
+import SelectField from "@/components/SelectField";
+import { CropperRef, Cropper } from "react-advanced-cropper";
+import "react-advanced-cropper/dist/style.css";
+import smirk from "./smirk.png";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
+export const imageRes = { width: 2848, height: 2000 };
+function capitalizeWords(input: string): string {
+  // Split the input string into words
+  const words = input.toLowerCase().split(" ");
+
+  // Capitalize the first letter of each word
+  const capitalizedWords = words.map((word) => {
+    if (word.length > 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+    return "";
+  });
+
+  // Join the capitalized words back into a string
+  const result = capitalizedWords.join(" ");
+
+  return result;
+}
 
 export default function Home() {
+  const [stageSize] = useState({
+    width: imageRes.width * 0.3,
+    height: imageRes.height * 0.3,
+    scaleX: (imageRes.width * 0.3) / imageRes.width,
+    scaleY: (imageRes.height * 0.3) / imageRes.height,
+    // scaleX: 1,
+    // scaleY: 1,
+  });
+
+  const [index, setIndex] = useState(1);
+  const [photoImage, setPhotoImage] = useState(smirk.src);
+  const { dataSheet, setDataSheet } = useDataSheetStore();
+  const {
+    addressIndex,
+    contactNumberIndex,
+    guardianNameIndex,
+    studentNameIndex,
+    lrnIndex,
+
+    setAddressIndex,
+    setContactNumberIndex,
+    setStudentFirstNameIndex,
+    setStudentMiddleNameIndex,
+    setStudentLastNameIndex,
+    setStudentSuffixIndex,
+    setGuardianNameIndex,
+    setLrnIndex,
+  } = useIdValuesStore();
+  const { idImages, profileImages, addIdImage, addProfileImages } =
+    useImageStore();
+
+  const stageRef = useRef<Konva.Stage>(null);
+  const [lastNameStyle, setLastNameStyle] = useState({
+    x: 130,
+    y: 600,
+    fontSize: 90,
+  });
+  const [nameStyle, setNameStyle] = useState({
+    x: 130,
+    y: 712,
+    fontSize: 70,
+  });
+  const [secStyle, setSecStyle] = useState({ x: 216, y: 1708, fontSize: 60 });
+  const [rdStyle, setRdStyle] = useState({ x: 160, y: 1800, fontSize: 56 });
+  const [lrnStyle, setLrnStyle] = useState({ x: 375, y: 1867, fontSize: 56 });
+
+  const [photoStyle, setPhotoStyle] = useState({
+    x: 712,
+    y: 470,
+    width: 1000,
+    height: 1000,
+    scale: 1.5,
+  });
+  const [guardianNameStyle, setGuardianNameStyle] = useState({
+    x: 1565,
+    y: 569,
+    fontSize: 56,
+  });
+  const [contactNumStyle, setContactNumStyle] = useState({
+    x: 1660,
+    y: 795,
+    fontSize: 56,
+  });
+  const [addressStyle, setAddressStyle] = useState({
+    x: 1660,
+    y: 1033,
+    fontSize: 56,
+  });
+  const [adviserStyle, setAdviserStyle] = useState({
+    x: 1660,
+    y: 1345,
+    fontSize: 56,
+  });
+  const [adviserText, setAdviserText] = useState("");
+  const [secText, setSecText] = useState("");
+  const [isStem, setIsStem] = useState(true);
+  const [isDone, setIsDone] = useState(false);
+
+  const generateImages = () => {
+    if (stageRef.current !== null && !isDone) {
+      if (index + 1 === dataSheet.length) {
+        console.log("done");
+        setIsDone(true);
+      }
+      // set size to full resolution
+      stageRef.current.width(imageRes.width);
+      stageRef.current.height(imageRes.height);
+
+      stageRef.current.scaleX(1);
+      stageRef.current.scaleY(1);
+
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+      const blob = dataURItoBlob(dataURL);
+      addIdImage(blob);
+
+      console.log(index, dataSheet.length);
+
+      if (index < dataSheet.length - 1) {
+        setIndex(index + 1);
+      }
+      // reset to default size
+      stageRef.current.width(stageSize.width);
+      stageRef.current.height(stageSize.height);
+
+      stageRef.current.scaleX(stageSize.scaleX);
+      stageRef.current.scaleY(stageSize.scaleY);
+    }
+  };
+  const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
+    if (evt.target.files !== null) {
+      setIndex(1);
+      setIsDone(false);
+      console.log(evt.target.files[0]);
+      const spreadsheet = read(await evt.target.files[0].arrayBuffer(), {
+        type: "buffer",
+      });
+      const worksheet = spreadsheet.Sheets[spreadsheet.SheetNames[0]];
+      const raw_data = utils
+        .sheet_to_json(worksheet, { header: 1 })
+        .filter((val: any) => val.length > 0);
+      console.log(raw_data);
+      setDataSheet(raw_data as string[][]);
+    }
+  };
+  const cropperRef = useRef<CropperRef>(null);
+  const [isCropOpen, setIsCropOpen] = useState(false);
+  const onCrop = () => {
+    if (cropperRef.current) {
+      setPhotoImage(cropperRef.current.getCanvas()?.toDataURL() as string);
+      setIsCropOpen(false);
+    }
+  };
+  const setOr = (
+    indexValue?: number,
+    defaultValue?: string,
+    caps: boolean = false
+  ) =>
+    dataSheet.length !== 0
+      ? caps
+        ? capitalizeWords((dataSheet[index][indexValue ?? 0] ?? "").toString())
+        : dataSheet[index][indexValue ?? 0] ?? ""
+      : defaultValue;
+  const onImagesChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (event.target.files !== null) {
+      console.log(event.target.files);
+      addProfileImages(Array.from(event.target.files));
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="flex flex-col gap-2 mt-2 ml-2">
+      <div className="flex flex-row gap-2">
+        <div className="flex flex-col gap-2">
+          {IDCanvas(
+            stageRef,
+            stageSize,
+            lastNameStyle,
+            nameStyle,
+            setOr,
+            studentNameIndex,
+            secStyle,
+            secText,
+            rdStyle,
+            photoStyle,
+            setPhotoStyle,
+            guardianNameStyle,
+            guardianNameIndex,
+            contactNumStyle,
+            contactNumberIndex,
+            addressStyle,
+            addressIndex,
+            adviserStyle,
+            adviserText,
+            lrnIndex,
+            lrnStyle,
+            photoImage,
+            isStem
+          )}
+          <div className="grid grid-cols-5 max-w-xl gap-2">
+            {profileImages.map((val, idx) => {
+              const imageUrl = URL.createObjectURL(val);
+              return (
+                <button
+                  className="flex flex-col items-center gap-1 max-w-[125px] "
+                  onClick={() => {
+                    console.log(idx);
+                    setPhotoImage(imageUrl);
+                  }}
+                  key={idx}
+                >
+                  <img src={imageUrl} alt="" />
+                  <p className="text-center break-all">{val.name}</p>
+                </button>
+              );
+            })}
+          </div>
         </div>
+        <div className="flex flex-row">
+          {/* <DataImport></DataImport> */}
+          <div>
+            {dataSheet.length !== 0 && (
+              <div>
+                <div>
+                  {SelectField(
+                    "First Name",
+                    setStudentFirstNameIndex,
+                    dataSheet
+                  )}
+                  {SelectField(
+                    "Middle Name",
+                    setStudentMiddleNameIndex,
+                    dataSheet
+                  )}
+                  {SelectField("Last Name", setStudentLastNameIndex, dataSheet)}
+                  {SelectField("Suffix", setStudentSuffixIndex, dataSheet)}
+                </div>
+
+                {SelectField("Guardian Name", setGuardianNameIndex, dataSheet)}
+                {SelectField(
+                  "Contact Number",
+                  setContactNumberIndex,
+                  dataSheet
+                )}
+
+                {SelectField("Address", setAddressIndex, dataSheet)}
+                {SelectField("LRN", setLrnIndex, dataSheet)}
+              </div>
+            )}
+            <div>
+              <Label>Student Pictures:</Label>
+              <Input
+                type="file"
+                name="images"
+                onChange={onImagesChange}
+                multiple
+                accept="image/*"
+              ></Input>
+              <div>
+                <Dialog open={isCropOpen}>
+                  <DialogTrigger asChild>
+                    <div className="flex w-full items-center justify-center">
+                      <Button
+                        className="my-2 "
+                        onClick={() => setIsCropOpen(true)}
+                      >
+                        Edit Image
+                      </Button>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <Cropper ref={cropperRef} src={photoImage}></Cropper>
+                    <Button onClick={() => onCrop()}>Crop</Button>
+                    <DialogClose asChild>
+                      <Button onClick={() => setIsCropOpen(false)}>
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <Label>Spreadsheet:</Label>
+
+              <Input
+                type="file"
+                name="data"
+                id="data"
+                onChange={onFileChange}
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              />
+              <div className="flex flex-row justify-center gap-2 my-2">
+                <Button onClick={generateImages} disabled={isDone}>
+                  {isDone ? "Done" : "Generate Next"}
+                </Button>
+
+                <Button
+                  onClick={async () => {
+                    await zipAndDownloadImages(idImages, "ID Images");
+                  }}
+                >
+                  Download
+                </Button>
+              </div>
+              <div>
+                <div className="flex flex-row justify-center items-center my-1">
+                  <Label>STEM?</Label>
+                  <Checkbox
+                    checked={isStem}
+                    onCheckedChange={() => {
+                      setIsStem((state) => !state);
+                    }}
+                  ></Checkbox>
+                </div>
+                <div className="my-1 flex flex-col gap-1">
+                  <Input
+                    type="text"
+                    placeholder="Adviser Name:"
+                    onChange={(e) => setAdviserText(e.target.value)}
+                  ></Input>
+                  <Input
+                    type="text"
+                    placeholder="Section Name:"
+                    onChange={(e) => setSecText(e.target.value)}
+                  ></Input>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label>
+                    Photo: x: {photoStyle.x} y: {photoStyle.y} scale:{" "}
+                    {photoStyle.scale}
+                  </Label>
+                  <Slider
+                    defaultValue={[photoStyle.x]}
+                    max={imageRes.height}
+                    onValueChange={(val) => {
+                      setPhotoStyle((state) => ({ ...state, x: val[0] }));
+                    }}
+                  ></Slider>
+                  <Slider
+                    defaultValue={[photoStyle.y]}
+                    max={imageRes.height}
+                    onValueChange={(val) => {
+                      setPhotoStyle((state) => ({ ...state, y: val[0] }));
+                    }}
+                  ></Slider>
+                  <Slider
+                    defaultValue={[photoStyle.scale]}
+                    max={5}
+                    onValueChange={(val) => {
+                      setPhotoStyle((state) => ({ ...state, scale: val[0] }));
+                    }}
+                    step={0.01}
+                  ></Slider>
+                </div>
+                <div>
+                  <Label>
+                    Last Name: x: {lastNameStyle.x} y: {lastNameStyle.y} size:{" "}
+                    {lastNameStyle.fontSize}
+                  </Label>
+                  {Sliders(lastNameStyle, setLastNameStyle)}
+                </div>
+                <div>
+                  <Label>
+                    Name: x: {nameStyle.x} y: {nameStyle.y} size:{" "}
+                    {nameStyle.fontSize}
+                  </Label>
+                  {Sliders(nameStyle, setNameStyle)}
+                </div>
+                <div>
+                  <Label>
+                    Section: x: {secStyle.x} y: {secStyle.y}
+                  </Label>
+
+                  {Sliders(secStyle, setSecStyle)}
+                </div>
+                <div>
+                  <Label>
+                    Guardian Name: x: {guardianNameStyle.x} y:{" "}
+                    {guardianNameStyle.y}
+                  </Label>
+
+                  {Sliders(guardianNameStyle, setGuardianNameStyle)}
+                </div>
+                <div>
+                  <Label>
+                    Contact Number: x: {contactNumStyle.x} y:{" "}
+                    {contactNumStyle.y}
+                  </Label>
+
+                  {Sliders(contactNumStyle, setContactNumStyle)}
+                </div>
+                <div>
+                  <Label>
+                    Address: x: {addressStyle.x} y: {addressStyle.y}
+                  </Label>
+
+                  {Sliders(addressStyle, setAddressStyle)}
+                </div>
+                <div>
+                  <Label>
+                    Adviser: x: {adviserStyle.x} y: {adviserStyle.y}
+                  </Label>
+
+                  {Sliders(adviserStyle, setAdviserStyle)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* <div className="grid grid-flow-col ">
+          {idImages.map((val) => {
+            const imageUrl = URL.createObjectURL(val);
+            return <img src={imageUrl} alt="" />;
+          })}
+        </div> */}
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }
