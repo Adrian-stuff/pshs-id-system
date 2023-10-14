@@ -1,4 +1,5 @@
-import { imageRes } from "@/app/page";
+import { imageRes } from "@/app/utils";
+
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Dispatch, SetStateAction } from "react";

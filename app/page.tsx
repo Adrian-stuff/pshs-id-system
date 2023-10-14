@@ -44,7 +44,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
-export const imageRes = { width: 2848, height: 2000 };
+import { imageRes } from "./utils";
 function capitalizeWords(input: string): string {
   // Split the input string into words
   const words = input.toLowerCase().split(" ");

@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import FileSaver from "file-saver";
+export const imageRes = { width: 2848, height: 2000 };
 
 // Create a function to zip and download blob images
 export async function zipAndDownloadImages(
