@@ -1,3 +1,5 @@
+"use client";
+
 import URLImage from "@/app/UrlImage";
 import { Dispatch, KeyboardEvent, SetStateAction } from "react";
 import { Stage, Layer, Text } from "react-konva";

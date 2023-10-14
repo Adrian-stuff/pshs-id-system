@@ -1,3 +1,5 @@
+"use client";
+
 import { imageRes } from "@/app/utils";
 
 import { Slider } from "@/components/ui/slider";
