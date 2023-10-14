@@ -141,9 +141,11 @@ export default function Home() {
   const [secText, setSecText] = useState("");
   const [isStem, setIsStem] = useState(true);
   const [isDone, setIsDone] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const generateImages = () => {
     if (stageRef.current !== null && !isDone) {
+      setIsGenerating(true);
       if (index + 1 === dataSheet.length) {
         console.log("done");
         setIsDone(true);
@@ -170,6 +172,7 @@ export default function Home() {
 
       stageRef.current.scaleX(stageSize.scaleX);
       stageRef.current.scaleY(stageSize.scaleY);
+      setIsGenerating(false);
     }
   };
   const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
@@ -333,19 +336,37 @@ export default function Home() {
                 onChange={onFileChange}
                 accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               />
-              <div className="flex flex-row justify-center gap-2 my-2">
-                <Button onClick={generateImages} disabled={isDone}>
-                  {isDone ? "Done" : "Generate Next"}
-                </Button>
-
-                <Button
-                  onClick={async () => {
-                    await zipAndDownloadImages(idImages, "ID Images");
-                  }}
-                >
-                  Download
-                </Button>
-              </div>
+              {dataSheet.length !== 0 ? (
+                <div>
+                  <div className="flex flex-row justify-center gap-2 my-2">
+                    <Button
+                      onClick={generateImages}
+                      disabled={isDone || isGenerating}
+                    >
+                      {isGenerating
+                        ? "Generating"
+                        : isDone
+                        ? "Done"
+                        : "Generate Next"}
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        await zipAndDownloadImages(idImages, "ID Images");
+                      }}
+                    >
+                      Download
+                    </Button>
+                  </div>
+                  <h1>
+                    {idImages.length.toString()} out of{" "}
+                    {dataSheet.length.toString()} generated
+                  </h1>
+                </div>
+              ) : (
+                <h1 className="my-2 text-center">
+                  Select a Spreadsheet to start
+                </h1>
+              )}
               <div>
                 <div className="flex flex-row justify-center items-center my-1">
                   <Label>STEM?</Label>
