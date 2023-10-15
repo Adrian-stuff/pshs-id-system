@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { imageRes } from "./utils";
+import CustomTextField from "@/components/CustomTextField";
 function capitalizeWords(input: string): string {
   // Split the input string into words
   const words = input.toLowerCase().split(" ");
@@ -177,6 +178,7 @@ export default function Home() {
   };
   const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
     if (evt.target.files !== null) {
+      setIsCustomText(false);
       setIndex(1);
       setIsDone(false);
       console.log(evt.target.files[0]);
@@ -199,16 +201,42 @@ export default function Home() {
       setIsCropOpen(false);
     }
   };
-  const setOr = (
-    indexValue?: number,
-    defaultValue?: string,
-    caps: boolean = false
-  ) =>
-    dataSheet.length !== 0
-      ? caps
-        ? capitalizeWords((dataSheet[index][indexValue ?? 0] ?? "").toString())
-        : dataSheet[index][indexValue ?? 0] ?? ""
-      : defaultValue;
+  const [isCustomText, setIsCustomText] = useState(false);
+  const [lastName, setLastName] = useState("last_name");
+  const [firstName, setFirstName] = useState("first_name");
+  const [middleName, setMiddleName] = useState("middle_name");
+  const [lrn, setLRN] = useState("lrn");
+  const [suffix, setSuffix] = useState("");
+  const [guardian, setGuardian] = useState("guardian");
+  const [contactNumber, setContactNumber] = useState("contact_number");
+  const [address, setAddress] = useState("address");
+  const setOr = ({
+    indexValue,
+    defaultValue,
+    caps = false,
+    customText,
+  }: {
+    indexValue?: number;
+    defaultValue?: string;
+    caps?: boolean;
+    customText?: string;
+  }) => {
+    let result: string | undefined;
+    if (dataSheet.length !== 0) {
+      if (caps) {
+        result = capitalizeWords(
+          (dataSheet[index][indexValue ?? 0] ?? "").toString()
+        );
+      } else {
+        result = dataSheet[index][indexValue ?? 0] ?? "";
+      }
+    } else if (isCustomText) {
+      result = customText;
+    } else {
+      result = defaultValue;
+    }
+    return result;
+  };
   const onImagesChange = (event: ChangeEvent<HTMLInputElement>): void => {
     if (event.target.files !== null) {
       console.log(event.target.files);
@@ -243,6 +271,14 @@ export default function Home() {
               adviserText,
               lrnIndex,
               lrnStyle,
+              lastName,
+              firstName,
+              middleName,
+              lrn,
+              suffix,
+              guardian,
+              contactNumber,
+              address,
               photoImage,
               isStem
             )}
@@ -302,6 +338,50 @@ export default function Home() {
                   {SelectField("LRN", setLrnIndex, dataSheet)}
                 </div>
               )}
+              {isCustomText && (
+                <div>
+                  <CustomTextField
+                    name="Last Name"
+                    value={lastName}
+                    setCustomText={setLastName}
+                  />
+                  <CustomTextField
+                    name="First Name"
+                    value={firstName}
+                    setCustomText={setFirstName}
+                  />
+                  <CustomTextField
+                    name="Middle Name"
+                    value={middleName}
+                    setCustomText={setMiddleName}
+                  />
+                  <CustomTextField
+                    name="LRN"
+                    value={lrn}
+                    setCustomText={setLRN}
+                  />
+                  <CustomTextField
+                    name="Suffix"
+                    value={suffix}
+                    setCustomText={setSuffix}
+                  />
+                  <CustomTextField
+                    name="Guardian"
+                    value={guardian}
+                    setCustomText={setGuardian}
+                  />
+                  <CustomTextField
+                    name="Contact Number"
+                    value={contactNumber}
+                    setCustomText={setContactNumber}
+                  />
+                  <CustomTextField
+                    name="Address"
+                    value={address}
+                    setCustomText={setAddress}
+                  />
+                </div>
+              )}
               <div>
                 <Label>Student Pictures:</Label>
                 <Input
@@ -342,7 +422,7 @@ export default function Home() {
                   onChange={onFileChange}
                   accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 />
-                {dataSheet.length !== 0 ? (
+                {dataSheet.length !== 0 && !isCustomText ? (
                   <div>
                     <div className="flex flex-row justify-center gap-2 my-2">
                       <Button
@@ -375,13 +455,26 @@ export default function Home() {
                 )}
                 <div>
                   <div className="flex flex-row justify-center items-center my-1">
-                    <Label>STEM?</Label>
-                    <Checkbox
-                      checked={isStem}
-                      onCheckedChange={() => {
-                        setIsStem((state) => !state);
-                      }}
-                    ></Checkbox>
+                    <div>
+                      <Label>STEM?</Label>
+                      <Checkbox
+                        checked={isStem}
+                        onCheckedChange={() => {
+                          setIsStem((state) => !state);
+                        }}
+                      ></Checkbox>
+                    </div>
+                    {dataSheet.length === 0 && (
+                      <div>
+                        <Label>Use Custom Text</Label>
+                        <Checkbox
+                          checked={isCustomText}
+                          onCheckedChange={() => {
+                            setIsCustomText((state) => !state);
+                          }}
+                        ></Checkbox>
+                      </div>
+                    )}
                   </div>
                   <div className="my-1 flex flex-col gap-1">
                     <Input

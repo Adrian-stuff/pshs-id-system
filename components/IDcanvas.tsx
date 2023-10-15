@@ -12,11 +12,17 @@ export default function IDCanvas(
   stageSize: { width: number; height: number; scaleX: number; scaleY: number },
   lastNameStyle: { x: number; y: number; fontSize: number },
   nameStyle: { x: number; y: number; fontSize: number },
-  setOr: (
-    indexValue?: number,
-    defaultValue?: string,
-    caps?: boolean
-  ) => string | undefined,
+  setOr: ({
+    indexValue,
+    defaultValue,
+    caps,
+    customText,
+  }: {
+    indexValue?: number;
+    defaultValue?: string;
+    caps?: boolean;
+    customText?: string;
+  }) => string | undefined,
   studentNameIndex: {
     first?: number | undefined;
     middle?: number | undefined;
@@ -52,6 +58,15 @@ export default function IDCanvas(
   adviserText: string,
   lrnIndex: number,
   lrnStyle: { x: number; y: number; fontSize: number },
+
+  lastName: string,
+  firstName: string,
+  middleName: string,
+  lrn: string,
+  suffix: string,
+  guardian: string,
+  contactNumber: string,
+  address: string,
 
   photoImage: string,
   isStem: boolean
@@ -101,11 +116,12 @@ export default function IDCanvas(
             y={lastNameStyle.y}
             x={lastNameStyle.x}
             fontSize={lastNameStyle.fontSize}
-            text={`${setOr(
-              studentNameIndex.last,
-              "STUDENT_NAME",
-              true
-            )?.trim()},`}
+            text={`${setOr({
+              indexValue: studentNameIndex.last,
+              defaultValue: "STUDENT_NAME",
+              caps: true,
+              customText: lastName,
+            })?.trim()},`}
             fill="#e2b808"
             shadowBlur={25}
             shadowOpacity={0.4}
@@ -122,11 +138,24 @@ export default function IDCanvas(
             y={nameStyle.y}
             x={nameStyle.x}
             fontSize={nameStyle.fontSize}
-            text={`${setOr(studentNameIndex.first, "FIRST_NAME", true)} ${setOr(
-              studentNameIndex.middle,
-              "",
-              true
-            )} ${setOr(studentNameIndex.suffix, "")}`}
+            text={`${setOr({
+              indexValue: studentNameIndex.first,
+              defaultValue: "FIRST_NAME",
+              customText: firstName,
+
+              caps: true,
+            })} ${setOr({
+              indexValue: studentNameIndex.middle,
+              defaultValue: "",
+              customText: middleName,
+
+              caps: true,
+            })} ${setOr({
+              indexValue: studentNameIndex.suffix,
+              customText: suffix,
+
+              defaultValue: "",
+            })}`}
             fill="#fcffde"
             shadowBlur={25}
             shadowOpacity={0.5}
@@ -160,7 +189,13 @@ export default function IDCanvas(
             y={lrnStyle.y}
             x={lrnStyle.x}
             fontSize={lrnStyle.fontSize}
-            text={`LRN: ${setOr(lrnIndex, "LRN", true)?.trim()}`}
+            text={`LRN: ${setOr({
+              indexValue: lrnIndex,
+              defaultValue: "LRN",
+              customText: lrn,
+
+              caps: true,
+            })?.trim()}`}
             wrap="char"
             align="center"
             fill="#fcffde"
@@ -192,7 +227,13 @@ export default function IDCanvas(
             y={guardianNameStyle.y}
             x={guardianNameStyle.x}
             fontSize={guardianNameStyle.fontSize}
-            text={setOr(guardianNameIndex, "GUARDIAN_NAME", true)?.trim()}
+            text={setOr({
+              indexValue: guardianNameIndex,
+              defaultValue: "GUARDIAN_NAME",
+              customText: guardian,
+
+              caps: true,
+            })?.trim()}
             width={1200}
             align="center"
             fontFamily="Noto Serif"
@@ -201,7 +242,12 @@ export default function IDCanvas(
             y={contactNumStyle.y}
             x={contactNumStyle.x}
             fontSize={contactNumStyle.fontSize}
-            text={setOr(contactNumberIndex, "CONTACT_NUMBER")}
+            text={setOr({
+              indexValue: contactNumberIndex,
+              customText: contactNumber,
+
+              defaultValue: "CONTACT_NUMBER",
+            })}
             width={1000}
             align="center"
             fontFamily="Noto Serif"
@@ -210,7 +256,12 @@ export default function IDCanvas(
             y={addressStyle.y}
             x={addressStyle.x}
             fontSize={addressStyle.fontSize}
-            text={setOr(addressIndex, "ADDRESS")}
+            text={setOr({
+              indexValue: addressIndex,
+              customText: address,
+
+              defaultValue: "ADDRESS",
+            })}
             width={1000}
             align="center"
             fontFamily="Noto Serif"
