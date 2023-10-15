@@ -106,9 +106,9 @@ export default function Home() {
     y: 712,
     fontSize: 70,
   });
-  const [secStyle, setSecStyle] = useState({ x: 216, y: 1708, fontSize: 60 });
+  const [secStyle, setSecStyle] = useState({ x: 0, y: 1715, fontSize: 60 });
   const [rdStyle, setRdStyle] = useState({ x: 160, y: 1800, fontSize: 56 });
-  const [lrnStyle, setLrnStyle] = useState({ x: 375, y: 1867, fontSize: 56 });
+  const [lrnStyle, setLrnStyle] = useState({ x: 25, y: 1867, fontSize: 56 });
 
   const [photoStyle, setPhotoStyle] = useState({
     x: 712,
@@ -442,6 +442,13 @@ export default function Home() {
                       Section: x: {secStyle.x} y: {secStyle.y}
                     </Label>
                     {Sliders(secStyle, setSecStyle)}
+                  </div>
+                  <div>
+                    <Label>
+                      LRN: x: {lrnStyle.x} y: {lrnStyle.y} size:{" "}
+                      {lrnStyle.fontSize}
+                    </Label>
+                    {Sliders(lrnStyle, setLrnStyle)}
                   </div>
                   <div>
                     <Label>

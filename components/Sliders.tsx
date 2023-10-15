@@ -25,6 +25,7 @@ export default function Sliders(
       <div className=" grid grid-flow-row w-full">
         <Slider
           defaultValue={[style.x]}
+          min={-10}
           max={imageRes.height}
           onValueChange={(val) => {
             setStyle((state) => ({ ...state, x: val[0] }));

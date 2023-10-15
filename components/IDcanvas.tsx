@@ -107,13 +107,14 @@ export default function IDCanvas(
               true
             )?.trim()},`}
             fill="#e2b808"
-            shadowBlur={20}
-            shadowOpacity={0.3}
+            shadowBlur={25}
+            shadowOpacity={0.4}
             shadowEnabled
-            shadowOffsetX={-5}
-            shadowOffsetY={10}
+            shadowOffsetX={-2}
+            shadowOffsetY={3}
             wrap="word"
-            width={780}
+            letterSpacing={3}
+            width={900}
             fontFamily="Horizon"
           ></Text>
 
@@ -127,11 +128,12 @@ export default function IDCanvas(
               true
             )} ${setOr(studentNameIndex.suffix, "")}`}
             fill="#fcffde"
-            shadowBlur={20}
-            shadowOpacity={0.3}
+            shadowBlur={25}
+            shadowOpacity={0.5}
             shadowEnabled
-            shadowOffsetX={-5}
-            shadowOffsetY={10}
+            shadowOffsetX={-2}
+            shadowOffsetY={3}
+            letterSpacing={3}
             wrap="word"
             width={900}
             fontFamily="Horizon"
@@ -144,14 +146,14 @@ export default function IDCanvas(
             wrap="word"
             align="center"
             // fill="#e2b808"
-
-            fill="green"
-            shadowBlur={20}
-            shadowOpacity={0.3}
-            shadowEnabled
-            shadowOffsetX={-4}
-            shadowOffsetY={4}
-            width={1000}
+            letterSpacing={15}
+            fill="#031b17"
+            // shadowBlur={20}
+            // shadowOpacity={0.3}
+            // shadowEnabled
+            // shadowOffsetX={-4}
+            // shadowOffsetY={4}
+            width={1414}
             fontFamily="Horizon"
           ></Text>
           <Text
@@ -162,7 +164,8 @@ export default function IDCanvas(
             wrap="char"
             align="center"
             fill="#fcffde"
-            width={700}
+            letterSpacing={13}
+            width={1414}
             fontFamily="Noto Serif"
           ></Text>
           <URLImage
