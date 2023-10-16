@@ -1,7 +1,28 @@
 import JSZip from "jszip";
 import FileSaver from "file-saver";
 export const imageRes = { width: 2848, height: 2000 };
-
+export const stemSections = [
+  { section: "12 - MARIE CURIE", fontSize: 60 },
+  { section: "12 - CHARLES FLINT", fontSize: 60 },
+  { section: "12 - ISAAC NEWTON", fontSize: 60 },
+  { section: "12 - ALBERT EINSTEIN", fontSize: 60 },
+  { section: "11 - DIOSDADO BANATAO", fontSize: 60 },
+  { section: "11 - GREGORIO ZARA", fontSize: 60 },
+  { section: "11 - FE DEL MUNDO", fontSize: 60 },
+  { section: "11 - CASIMIRO DEL ROSARIO", fontSize: 60 },
+  { section: "11 - EDUARDO QUISIMBING", fontSize: 60 },
+  { section: "11 - CLARA LIM-SYLIANCO", fontSize: 60 },
+];
+export const humssSections = [
+  { section: "12 - NICK JOAQUIN", fontSize: 60 },
+  { section: "12 - JUAN NAKPIL", fontSize: 60 },
+  { section: "12 - FERNANDO AMORSOLO", fontSize: 60 },
+  { section: "11 - ANDRES BONIFACIO", fontSize: 60 },
+  { section: "11 - JOSE RIZAL", fontSize: 60 },
+  { section: "11 - APOLINARIO MABINI", fontSize: 60 },
+  { section: "11 - AQUINO", fontSize: 60 },
+  { section: "11 - GABRIELA SILANG", fontSize: 60 },
+];
 // Create a function to zip and download blob images
 export async function zipAndDownloadImages(
   blobImages: Blob[],
@@ -35,26 +56,27 @@ export async function zipAndDownloadImages(
 // const zipFileName = 'images.zip';
 
 // zipAndDownloadImages(blobImages, zipFileName);
-export function dataURItoBlob(dataURI: string) {
-  // convert base64 to raw binary data held in a string
-  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  var byteString = atob(dataURI.split(",")[1]);
+export async function dataURItoBlob(dataURI: string): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    // Convert base64 to raw binary data held in a string
+    const byteString = atob(dataURI.split(",")[1]);
 
-  // separate out the mime component
-  var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+    // Separate out the mime component
+    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
 
-  // write the bytes of the string to an ArrayBuffer
-  var ab = new ArrayBuffer(byteString.length);
+    // Write the bytes of the string to an ArrayBuffer
+    const ab = new ArrayBuffer(byteString.length);
 
-  // create a view into the buffer
-  var ia = new Uint8Array(ab);
+    // Create a view into the buffer
+    const ia = new Uint8Array(ab);
 
-  // set the bytes of the buffer to the correct values
-  for (var i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
+    // Set the bytes of the buffer to the correct values
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
 
-  // write the ArrayBuffer to a blob, and you're done
-  var blob = new Blob([ab], { type: mimeString });
-  return blob;
+    // Write the ArrayBuffer to a blob, and resolve the promise
+    const blob = new Blob([ab], { type: mimeString });
+    resolve(blob);
+  });
 }

@@ -10,14 +10,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { toBlob } from "html-to-image";
 import { zipAndDownloadImages, dataURItoBlob } from "./utils";
 
 import { useDataSheetStore, useIdValuesStore, useImageStore } from "./store";
-import { Stage, Layer, Text } from "react-konva";
 import Konva from "konva";
-import URLImage from "./UrlImage";
-import DataImport from "./DataImport";
+
 import { read, utils } from "xlsx";
 import {
   Select,
@@ -44,8 +41,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { imageRes } from "./utils";
+import { imageRes, stemSections, humssSections } from "./utils";
 import CustomTextField from "@/components/CustomTextField";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 function capitalizeWords(input: string): string {
   // Split the input string into words
   const words = input.toLowerCase().split(" ");
@@ -144,13 +147,15 @@ export default function Home() {
   const [isDone, setIsDone] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateImages = () => {
+  const generateImages = async () => {
+    setIsGenerating(true);
     if (stageRef.current !== null && !isDone) {
-      setIsGenerating(true);
       if (index + 1 === dataSheet.length) {
         console.log("done");
         setIsDone(true);
       }
+
+      console.log(isGenerating);
       // set size to full resolution
       stageRef.current.width(imageRes.width);
       stageRef.current.height(imageRes.height);
@@ -159,7 +164,7 @@ export default function Home() {
       stageRef.current.scaleY(1);
 
       const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-      const blob = dataURItoBlob(dataURL);
+      const blob = await dataURItoBlob(dataURL);
       addIdImage(blob);
 
       console.log(index, dataSheet.length);
@@ -167,7 +172,7 @@ export default function Home() {
       if (index < dataSheet.length - 1) {
         setIndex(index + 1);
       }
-      // reset to default size
+      // // reset to default size
       stageRef.current.width(stageSize.width);
       stageRef.current.height(stageSize.height);
 
@@ -176,6 +181,7 @@ export default function Home() {
       setIsGenerating(false);
     }
   };
+
   const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
     if (evt.target.files !== null) {
       setIsCustomText(false);
@@ -305,38 +311,47 @@ export default function Home() {
             {/* <DataImport></DataImport> */}
             <div>
               {dataSheet.length !== 0 && (
-                <div>
-                  <div>
-                    {SelectField(
-                      "First Name",
-                      setStudentFirstNameIndex,
-                      dataSheet
-                    )}
-                    {SelectField(
-                      "Middle Name",
-                      setStudentMiddleNameIndex,
-                      dataSheet
-                    )}
-                    {SelectField(
-                      "Last Name",
-                      setStudentLastNameIndex,
-                      dataSheet
-                    )}
-                    {SelectField("Suffix", setStudentSuffixIndex, dataSheet)}
-                  </div>
-                  {SelectField(
-                    "Guardian Name",
-                    setGuardianNameIndex,
-                    dataSheet
-                  )}
-                  {SelectField(
-                    "Contact Number",
-                    setContactNumberIndex,
-                    dataSheet
-                  )}
-                  {SelectField("Address", setAddressIndex, dataSheet)}
-                  {SelectField("LRN", setLrnIndex, dataSheet)}
-                </div>
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="Inputs">
+                    <AccordionTrigger>Set Inputs</AccordionTrigger>
+                    <AccordionContent className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1">
+                        {SelectField(
+                          "Last Name",
+                          setStudentLastNameIndex,
+                          dataSheet
+                        )}
+                        {SelectField(
+                          "First Name",
+                          setStudentFirstNameIndex,
+                          dataSheet
+                        )}
+                        {SelectField(
+                          "Middle Name",
+                          setStudentMiddleNameIndex,
+                          dataSheet
+                        )}
+                        {SelectField(
+                          "Suffix",
+                          setStudentSuffixIndex,
+                          dataSheet
+                        )}
+                      </div>
+                      {SelectField(
+                        "Guardian Name",
+                        setGuardianNameIndex,
+                        dataSheet
+                      )}
+                      {SelectField(
+                        "Contact Number",
+                        setContactNumberIndex,
+                        dataSheet
+                      )}
+                      {SelectField("Address", setAddressIndex, dataSheet)}
+                      {SelectField("LRN", setLrnIndex, dataSheet)}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               )}
               {isCustomText && (
                 <div>
@@ -422,11 +437,13 @@ export default function Home() {
                   onChange={onFileChange}
                   accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 />
-                {dataSheet.length !== 0 && !isCustomText ? (
+                {dataSheet.length !== 0 || isCustomText ? (
                   <div>
                     <div className="flex flex-row justify-center gap-2 my-2">
                       <Button
-                        onClick={generateImages}
+                        onClick={async () => {
+                          await generateImages();
+                        }}
                         disabled={isDone || isGenerating}
                       >
                         {isGenerating
@@ -480,95 +497,158 @@ export default function Home() {
                     <Input
                       type="text"
                       placeholder="Adviser Name:"
-                      onChange={(e) => setAdviserText(e.target.value)}
+                      onChange={(e) =>
+                        setAdviserText(e.target.value.toLocaleUpperCase())
+                      }
                     ></Input>
-                    <Input
-                      type="text"
-                      placeholder="Section Name:"
-                      onChange={(e) => setSecText(e.target.value)}
-                    ></Input>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label>
-                      Photo: x: {photoStyle.x} y: {photoStyle.y} scale:{" "}
-                      {photoStyle.scale}
-                    </Label>
-                    <Slider
-                      defaultValue={[photoStyle.x]}
-                      max={imageRes.height}
-                      onValueChange={(val) => {
-                        setPhotoStyle((state) => ({ ...state, x: val[0] }));
+
+                    <Select
+                      onValueChange={(value) => {
+                        setSecText(
+                          (isStem ? stemSections : humssSections)[+value]
+                            .section
+                        );
+                        setSecStyle((state) => ({
+                          ...state,
+                          fontSize: +(isStem ? stemSections : humssSections)[
+                            +value
+                          ].fontSize,
+                        }));
                       }}
-                    ></Slider>
-                    <Slider
-                      defaultValue={[photoStyle.y]}
-                      max={imageRes.height}
-                      onValueChange={(val) => {
-                        setPhotoStyle((state) => ({ ...state, y: val[0] }));
-                      }}
-                    ></Slider>
-                    <Slider
-                      defaultValue={[photoStyle.scale]}
-                      max={5}
-                      onValueChange={(val) => {
-                        setPhotoStyle((state) => ({ ...state, scale: val[0] }));
-                      }}
-                      step={0.01}
-                    ></Slider>
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Section"></SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(isStem ? stemSections : humssSections).map(
+                          (val, idx) => {
+                            return (
+                              <SelectItem value={idx.toString()} key={idx}>
+                                {val.section}
+                              </SelectItem>
+                            );
+                          }
+                        )}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div>
-                    <Label>
-                      Last Name: x: {lastNameStyle.x} y: {lastNameStyle.y} size:{" "}
-                      {lastNameStyle.fontSize}
-                    </Label>
-                    {Sliders(lastNameStyle, setLastNameStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      Name: x: {nameStyle.x} y: {nameStyle.y} size:{" "}
-                      {nameStyle.fontSize}
-                    </Label>
-                    {Sliders(nameStyle, setNameStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      Section: x: {secStyle.x} y: {secStyle.y}
-                    </Label>
-                    {Sliders(secStyle, setSecStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      LRN: x: {lrnStyle.x} y: {lrnStyle.y} size:{" "}
-                      {lrnStyle.fontSize}
-                    </Label>
-                    {Sliders(lrnStyle, setLrnStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      Guardian Name: x: {guardianNameStyle.x} y:{" "}
-                      {guardianNameStyle.y}
-                    </Label>
-                    {Sliders(guardianNameStyle, setGuardianNameStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      Contact Number: x: {contactNumStyle.x} y:{" "}
-                      {contactNumStyle.y}
-                    </Label>
-                    {Sliders(contactNumStyle, setContactNumStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      Address: x: {addressStyle.x} y: {addressStyle.y}
-                    </Label>
-                    {Sliders(addressStyle, setAddressStyle)}
-                  </div>
-                  <div>
-                    <Label>
-                      Adviser: x: {adviserStyle.x} y: {adviserStyle.y}
-                    </Label>
-                    {Sliders(adviserStyle, setAdviserStyle)}
-                  </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="editor">
+                      <AccordionTrigger>Edit Positions</AccordionTrigger>
+                      <AccordionContent>
+                        <Accordion type="multiple">
+                          <AccordionItem value="Photo">
+                            <AccordionTrigger>
+                              Photo: x: {photoStyle.x} y: {photoStyle.y} scale:{" "}
+                              {photoStyle.scale}
+                            </AccordionTrigger>
+                            <AccordionContent className="flex flex-col gap-2">
+                              <Slider
+                                defaultValue={[photoStyle.x]}
+                                max={imageRes.height}
+                                onValueChange={(val) => {
+                                  setPhotoStyle((state) => ({
+                                    ...state,
+                                    x: val[0],
+                                  }));
+                                }}
+                              ></Slider>
+                              <Slider
+                                defaultValue={[photoStyle.y]}
+                                max={imageRes.height}
+                                onValueChange={(val) => {
+                                  setPhotoStyle((state) => ({
+                                    ...state,
+                                    y: val[0],
+                                  }));
+                                }}
+                              ></Slider>
+                              <Slider
+                                defaultValue={[photoStyle.scale]}
+                                max={5}
+                                onValueChange={(val) => {
+                                  setPhotoStyle((state) => ({
+                                    ...state,
+                                    scale: val[0],
+                                  }));
+                                }}
+                                step={0.01}
+                              ></Slider>
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="lastName">
+                            <AccordionTrigger>
+                              Last Name: x: {lastNameStyle.x} y:{" "}
+                              {lastNameStyle.y} size: {lastNameStyle.fontSize}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(lastNameStyle, setLastNameStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="name">
+                            <AccordionTrigger>
+                              Name: x: {nameStyle.x} y: {nameStyle.y} size:{" "}
+                              {nameStyle.fontSize}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(nameStyle, setNameStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="section">
+                            <AccordionTrigger>
+                              Section: x: {secStyle.x} y: {secStyle.y}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(secStyle, setSecStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="lrn">
+                            <AccordionTrigger>
+                              LRN: x: {lrnStyle.x} y: {lrnStyle.y} size:{" "}
+                              {lrnStyle.fontSize}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(lrnStyle, setLrnStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="guardian">
+                            <AccordionTrigger>
+                              Guardian Name: x: {guardianNameStyle.x} y:{" "}
+                              {guardianNameStyle.y}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(guardianNameStyle, setGuardianNameStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="contactNumber">
+                            <AccordionTrigger>
+                              Contact Number: x: {contactNumStyle.x} y:{" "}
+                              {contactNumStyle.y}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(contactNumStyle, setContactNumStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="address">
+                            <AccordionTrigger>
+                              Address: x: {addressStyle.x} y: {addressStyle.y}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(addressStyle, setAddressStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="adviser">
+                            <AccordionTrigger>
+                              Adviser: x: {adviserStyle.x} y: {adviserStyle.y}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {Sliders(adviserStyle, setAdviserStyle)}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </div>
               </div>
             </div>
