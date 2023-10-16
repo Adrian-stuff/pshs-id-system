@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import FileSaver from "file-saver";
 export const imageRes = { width: 2848, height: 2000 };
+// TODO: finalize the sections
 export const stemSections = [
   { section: "12 - MARIE CURIE", fontSize: 60 },
   { section: "12 - CHARLES FLINT", fontSize: 60 },
