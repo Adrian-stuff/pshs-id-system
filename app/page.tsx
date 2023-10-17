@@ -163,9 +163,9 @@ export default function Home() {
       stageRef.current.scaleX(1);
       stageRef.current.scaleY(1);
 
-      const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-      const blob = await dataURItoBlob(dataURL);
-      addIdImage(blob);
+      // const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+      // const blob = await dataURItoBlob(dataURL);
+      // addIdImage(blob);
 
       console.log(index, dataSheet.length);
 
@@ -508,12 +508,14 @@ export default function Home() {
                           (isStem ? stemSections : humssSections)[+value]
                             .section
                         );
-                        setSecStyle((state) => ({
-                          ...state,
+                        setSecStyle({
+                          x: +(isStem ? stemSections : humssSections)[+value].x,
+                          y: +(isStem ? stemSections : humssSections)[+value].y,
                           fontSize: +(isStem ? stemSections : humssSections)[
                             +value
                           ].fontSize,
-                        }));
+                        });
+                        console.log(secStyle);
                       }}
                     >
                       <SelectTrigger>
@@ -542,38 +544,40 @@ export default function Home() {
                               Photo: x: {photoStyle.x} y: {photoStyle.y} scale:{" "}
                               {photoStyle.scale}
                             </AccordionTrigger>
-                            <AccordionContent className="flex flex-col gap-2">
-                              <Slider
-                                defaultValue={[photoStyle.x]}
-                                max={imageRes.height}
-                                onValueChange={(val) => {
-                                  setPhotoStyle((state) => ({
-                                    ...state,
-                                    x: val[0],
-                                  }));
-                                }}
-                              ></Slider>
-                              <Slider
-                                defaultValue={[photoStyle.y]}
-                                max={imageRes.height}
-                                onValueChange={(val) => {
-                                  setPhotoStyle((state) => ({
-                                    ...state,
-                                    y: val[0],
-                                  }));
-                                }}
-                              ></Slider>
-                              <Slider
-                                defaultValue={[photoStyle.scale]}
-                                max={5}
-                                onValueChange={(val) => {
-                                  setPhotoStyle((state) => ({
-                                    ...state,
-                                    scale: val[0],
-                                  }));
-                                }}
-                                step={0.01}
-                              ></Slider>
+                            <AccordionContent>
+                              <div className="flex flex-col gap-2">
+                                <Slider
+                                  defaultValue={[photoStyle.x]}
+                                  max={imageRes.height}
+                                  onValueChange={(val) => {
+                                    setPhotoStyle((state) => ({
+                                      ...state,
+                                      x: val[0],
+                                    }));
+                                  }}
+                                ></Slider>
+                                <Slider
+                                  defaultValue={[photoStyle.y]}
+                                  max={imageRes.height}
+                                  onValueChange={(val) => {
+                                    setPhotoStyle((state) => ({
+                                      ...state,
+                                      y: val[0],
+                                    }));
+                                  }}
+                                ></Slider>
+                                <Slider
+                                  defaultValue={[photoStyle.scale]}
+                                  max={5}
+                                  onValueChange={(val) => {
+                                    setPhotoStyle((state) => ({
+                                      ...state,
+                                      scale: val[0],
+                                    }));
+                                  }}
+                                  step={0.01}
+                                ></Slider>
+                              </div>
                             </AccordionContent>
                           </AccordionItem>
                           <AccordionItem value="lastName">
@@ -596,7 +600,8 @@ export default function Home() {
                           </AccordionItem>
                           <AccordionItem value="section">
                             <AccordionTrigger>
-                              Section: x: {secStyle.x} y: {secStyle.y}
+                              Section: x: {secStyle.x} y: {secStyle.y} size:{" "}
+                              {secStyle.fontSize}
                             </AccordionTrigger>
                             <AccordionContent>
                               {Sliders(secStyle, setSecStyle)}

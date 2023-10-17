@@ -45,7 +45,7 @@ export default function Sliders(
           type="number"
           min={12}
           max={120}
-          defaultValue={style.fontSize}
+          value={style.fontSize}
           onChange={(e) => {
             setStyle((state) => ({ ...state, fontSize: +e.target.value }));
             console.log(e.target.value);

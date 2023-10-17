@@ -2,27 +2,47 @@ import JSZip from "jszip";
 import FileSaver from "file-saver";
 export const imageRes = { width: 2848, height: 2000 };
 // TODO: finalize the sections
-export const stemSections = [
-  { section: "12 - MARIE CURIE", fontSize: 60 },
-  { section: "12 - CHARLES FLINT", fontSize: 60 },
-  { section: "12 - ISAAC NEWTON", fontSize: 60 },
-  { section: "12 - ALBERT EINSTEIN", fontSize: 60 },
-  { section: "11 - DIOSDADO BANATAO", fontSize: 60 },
-  { section: "11 - GREGORIO ZARA", fontSize: 60 },
-  { section: "11 - FE DEL MUNDO", fontSize: 60 },
-  { section: "11 - CASIMIRO DEL ROSARIO", fontSize: 60 },
-  { section: "11 - EDUARDO QUISIMBING", fontSize: 60 },
-  { section: "11 - CLARA LIM-SYLIANCO", fontSize: 60 },
+const defaultSecStyle = {
+  x: 0,
+  y: 1715,
+  fontSize: 60,
+};
+export const stemSections: {
+  x: number;
+  y: number;
+  fontSize: number;
+  section: string;
+}[] = [
+  { section: "12 - MARIE CURIE", ...defaultSecStyle },
+  { section: "12 - CHARLES FLINT", ...defaultSecStyle },
+  { section: "12 - ISAAC NEWTON", ...defaultSecStyle },
+  { section: "12 - ALBERT EINSTEIN", ...defaultSecStyle },
+  {
+    section: "11 - DIOSDADO BANATAO",
+    ...defaultSecStyle,
+    x: -10,
+    fontSize: 56,
+  },
+  { section: "11 - GREGORIO ZARA", ...defaultSecStyle },
+  { section: "11 - FE DEL MUNDO", ...defaultSecStyle },
+  { section: "11 - CASIMIRO DEL ROSARIO", ...defaultSecStyle },
+  { section: "11 - EDUARDO QUISIMBING", ...defaultSecStyle },
+  { section: "11 - CLARA LIM SYLIANCO", ...defaultSecStyle },
 ];
-export const humssSections = [
-  { section: "12 - NICK JOAQUIN", fontSize: 60 },
-  { section: "12 - JUAN NAKPIL", fontSize: 60 },
-  { section: "12 - FERNANDO AMORSOLO", fontSize: 60 },
-  { section: "11 - ANDRES BONIFACIO", fontSize: 60 },
-  { section: "11 - JOSE RIZAL", fontSize: 60 },
-  { section: "11 - APOLINARIO MABINI", fontSize: 60 },
-  { section: "11 - AQUINO", fontSize: 60 },
-  { section: "11 - GABRIELA SILANG", fontSize: 60 },
+export const humssSections: {
+  x: number;
+  y: number;
+  fontSize: number;
+  section: string;
+}[] = [
+  { section: "12 - NICK JOAQUIN", ...defaultSecStyle },
+  { section: "12 - JUAN NAKPIL", ...defaultSecStyle },
+  { section: "12 - FERNANDO AMORSOLO", ...defaultSecStyle },
+  { section: "11 - ANDRES BONIFACIO", ...defaultSecStyle },
+  { section: "11 - JOSE RIZAL", ...defaultSecStyle },
+  { section: "11 - APOLINARIO MABINI", ...defaultSecStyle, fontSize: 58 },
+  { section: "11 - MELCHORA AQUINO", ...defaultSecStyle },
+  { section: "11 - GABRIELA SILANG", ...defaultSecStyle },
 ];
 // Create a function to zip and download blob images
 export async function zipAndDownloadImages(
