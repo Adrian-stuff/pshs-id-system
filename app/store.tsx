@@ -9,7 +9,10 @@ interface IdImageState {
 
 interface DataSheetState {
   dataSheet: string[][];
+  baseSheet: string[][];
+
   setDataSheet: (dataSheet: string[][]) => void;
+  setBaseSheet: (baseSheet: string[][]) => void;
 }
 
 interface IdValuesState {
@@ -23,6 +26,8 @@ interface IdValuesState {
   contactNumberIndex: number;
   addressIndex: number;
   lrnIndex: number;
+  birthDateIndex: number;
+  sexIndex: number;
   setStudentFirstNameIndex: (index: number) => void;
   setStudentMiddleNameIndex: (index: number) => void;
   setStudentLastNameIndex: (index: number) => void;
@@ -32,6 +37,8 @@ interface IdValuesState {
   setContactNumberIndex: (index: number) => void;
   setAddressIndex: (index: number) => void;
   setLrnIndex: (index: number) => void;
+  setBirthDateIndex: (index: number) => void;
+  setSexIndex: (index: number) => void;
 }
 
 export const useImageStore = create<IdImageState>((set) => ({
@@ -44,15 +51,19 @@ export const useImageStore = create<IdImageState>((set) => ({
 
 export const useDataSheetStore = create<DataSheetState>((set) => ({
   dataSheet: [],
+  baseSheet: [],
   setDataSheet: (dataSheet) => set((state) => ({ dataSheet: dataSheet })),
+  setBaseSheet: (baseSheet) => set((state) => ({ baseSheet: baseSheet })),
 }));
 
 export const useIdValuesStore = create<IdValuesState>((set) => ({
-  studentNameIndex: { first: 0, middle: 0, last: 0, suffix: 0 },
-  guardianNameIndex: 0,
-  contactNumberIndex: 0,
-  addressIndex: 0,
-  lrnIndex: 0,
+  studentNameIndex: { first: 1, middle: 2, last: 0, suffix: 3 },
+  guardianNameIndex: 5,
+  contactNumberIndex: 6,
+  addressIndex: 7,
+  lrnIndex: 4,
+  birthDateIndex: 9,
+  sexIndex: 8,
 
   setStudentFirstNameIndex: (index: number) =>
     set((state) => ({
@@ -96,4 +107,7 @@ export const useIdValuesStore = create<IdValuesState>((set) => ({
     set((state) => ({ contactNumberIndex: index })),
   setAddressIndex: (index: number) => set((state) => ({ addressIndex: index })),
   setLrnIndex: (index: number) => set((state) => ({ lrnIndex: index })),
+  setBirthDateIndex: (index: number) =>
+    set((state) => ({ birthDateIndex: index })),
+  setSexIndex: (index: number) => set((state) => ({ sexIndex: index })),
 }));

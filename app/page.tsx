@@ -79,13 +79,16 @@ export default function Home() {
 
   const [index, setIndex] = useState(1);
   const [photoImage, setPhotoImage] = useState(smirk.src);
-  const { dataSheet, setDataSheet } = useDataSheetStore();
+  const { dataSheet, baseSheet, setDataSheet, setBaseSheet } =
+    useDataSheetStore();
   const {
     addressIndex,
     contactNumberIndex,
     guardianNameIndex,
     studentNameIndex,
     lrnIndex,
+    birthDateIndex,
+    sexIndex,
 
     setAddressIndex,
     setContactNumberIndex,
@@ -95,6 +98,8 @@ export default function Home() {
     setStudentSuffixIndex,
     setGuardianNameIndex,
     setLrnIndex,
+    setBirthDateIndex,
+    setSexIndex,
   } = useIdValuesStore();
   const { idImages, profileImages, addIdImage, addProfileImages } =
     useImageStore();
@@ -147,6 +152,26 @@ export default function Home() {
   const [isDone, setIsDone] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  useEffect(() => {
+    if (profileImages.length !== 0) {
+      const profileFromName = profileImages.filter((val) => {
+        return (
+          val.name.split(".")[0].toLocaleUpperCase().toString().trim() ==
+          dataSheet[index][studentNameIndex.last ?? 0]
+            .toString()
+            .toLocaleUpperCase()
+            .trim()
+        );
+      });
+      if (profileFromName.length !== 0) {
+        const imageUrl = URL.createObjectURL(profileFromName[0]);
+
+        console.log(profileFromName[0]);
+        setPhotoImage(imageUrl);
+      }
+    }
+  }, [profileImages, index, studentNameIndex]);
+
   const generateImages = async () => {
     setIsGenerating(true);
     if (stageRef.current !== null && !isDone) {
@@ -163,9 +188,9 @@ export default function Home() {
       stageRef.current.scaleX(1);
       stageRef.current.scaleY(1);
 
-      // const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-      // const blob = await dataURItoBlob(dataURL);
-      // addIdImage(blob);
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+      const blob = await dataURItoBlob(dataURL);
+      addIdImage(blob);
 
       console.log(index, dataSheet.length);
 
@@ -197,6 +222,7 @@ export default function Home() {
         .filter((val: any) => val.length > 0);
       console.log(raw_data);
       setDataSheet(raw_data as string[][]);
+      setBaseSheet(raw_data as string[][]);
     }
   };
   const cropperRef = useRef<CropperRef>(null);
@@ -208,6 +234,8 @@ export default function Home() {
     }
   };
   const [isCustomText, setIsCustomText] = useState(false);
+  const [isMale, setIsMale] = useState(true);
+
   const [lastName, setLastName] = useState("last_name");
   const [firstName, setFirstName] = useState("first_name");
   const [middleName, setMiddleName] = useState("middle_name");
@@ -216,6 +244,8 @@ export default function Home() {
   const [guardian, setGuardian] = useState("guardian");
   const [contactNumber, setContactNumber] = useState("contact_number");
   const [address, setAddress] = useState("address");
+  const [birthDate, setBirthDate] = useState("2000-03-08");
+
   const setOr = ({
     indexValue,
     defaultValue,
@@ -314,121 +344,104 @@ export default function Home() {
                 <Accordion type="single" collapsible>
                   <AccordionItem value="Inputs">
                     <AccordionTrigger>Set Inputs</AccordionTrigger>
-                    <AccordionContent className="flex flex-col gap-1">
+                    <AccordionContent>
                       <div className="flex flex-col gap-1">
                         {SelectField(
                           "Last Name",
                           setStudentLastNameIndex,
-                          dataSheet
+                          baseSheet
                         )}
                         {SelectField(
                           "First Name",
                           setStudentFirstNameIndex,
-                          dataSheet
+                          baseSheet
                         )}
                         {SelectField(
                           "Middle Name",
                           setStudentMiddleNameIndex,
-                          dataSheet
+                          baseSheet
                         )}
                         {SelectField(
                           "Suffix",
                           setStudentSuffixIndex,
-                          dataSheet
+                          baseSheet
                         )}
+                        {SelectField(
+                          "Guardian Name",
+                          setGuardianNameIndex,
+                          baseSheet
+                        )}
+                        {SelectField(
+                          "Contact Number",
+                          setContactNumberIndex,
+                          baseSheet
+                        )}
+                        {SelectField("Address", setAddressIndex, baseSheet)}
+                        {SelectField("LRN", setLrnIndex, baseSheet)}
+                        {SelectField("Birthdate", setLrnIndex, baseSheet)}
+                        {SelectField("Sex", setSexIndex, baseSheet)}
                       </div>
-                      {SelectField(
-                        "Guardian Name",
-                        setGuardianNameIndex,
-                        dataSheet
-                      )}
-                      {SelectField(
-                        "Contact Number",
-                        setContactNumberIndex,
-                        dataSheet
-                      )}
-                      {SelectField("Address", setAddressIndex, dataSheet)}
-                      {SelectField("LRN", setLrnIndex, dataSheet)}
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
               )}
               {isCustomText && (
-                <div>
-                  <CustomTextField
-                    name="Last Name"
-                    value={lastName}
-                    setCustomText={setLastName}
-                  />
-                  <CustomTextField
-                    name="First Name"
-                    value={firstName}
-                    setCustomText={setFirstName}
-                  />
-                  <CustomTextField
-                    name="Middle Name"
-                    value={middleName}
-                    setCustomText={setMiddleName}
-                  />
-                  <CustomTextField
-                    name="LRN"
-                    value={lrn}
-                    setCustomText={setLRN}
-                  />
-                  <CustomTextField
-                    name="Suffix"
-                    value={suffix}
-                    setCustomText={setSuffix}
-                  />
-                  <CustomTextField
-                    name="Guardian"
-                    value={guardian}
-                    setCustomText={setGuardian}
-                  />
-                  <CustomTextField
-                    name="Contact Number"
-                    value={contactNumber}
-                    setCustomText={setContactNumber}
-                  />
-                  <CustomTextField
-                    name="Address"
-                    value={address}
-                    setCustomText={setAddress}
-                  />
-                </div>
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="Inputs">
+                    <AccordionTrigger>Set Inputs</AccordionTrigger>
+                    <AccordionContent>
+                      <div>
+                        <CustomTextField
+                          name="Last Name"
+                          value={lastName}
+                          setCustomText={setLastName}
+                        />
+                        <CustomTextField
+                          name="First Name"
+                          value={firstName}
+                          setCustomText={setFirstName}
+                        />
+                        <CustomTextField
+                          name="Middle Name"
+                          value={middleName}
+                          setCustomText={setMiddleName}
+                        />
+                        <CustomTextField
+                          name="LRN"
+                          value={lrn}
+                          setCustomText={setLRN}
+                        />
+                        <CustomTextField
+                          name="Birthdate"
+                          value={birthDate}
+                          setCustomText={setBirthDate}
+                        />
+                        <CustomTextField
+                          name="Suffix"
+                          value={suffix}
+                          setCustomText={setSuffix}
+                        />
+                        <CustomTextField
+                          name="Guardian"
+                          value={guardian}
+                          setCustomText={setGuardian}
+                        />
+                        <CustomTextField
+                          name="Contact Number"
+                          value={contactNumber}
+                          setCustomText={setContactNumber}
+                        />
+                        <CustomTextField
+                          name="Address"
+                          value={address}
+                          setCustomText={setAddress}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               )}
               <div>
-                <Label>Student Pictures:</Label>
-                <Input
-                  type="file"
-                  name="images"
-                  onChange={onImagesChange}
-                  multiple
-                  accept="image/*"
-                ></Input>
-                <div>
-                  <Dialog open={isCropOpen}>
-                    <DialogTrigger asChild>
-                      <div className="flex w-full items-center justify-center">
-                        <Button
-                          className="my-2 "
-                          onClick={() => setIsCropOpen(true)}
-                        >
-                          Edit Image
-                        </Button>
-                      </div>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <Cropper ref={cropperRef} src={photoImage}></Cropper>
-                      <Button onClick={() => onCrop()}>Crop</Button>
-                      <DialogClose asChild>
-                        <Button onClick={() => setIsCropOpen(false)}>
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                    </DialogContent>
-                  </Dialog>
-                </div>
                 <Label>Spreadsheet:</Label>
                 <Input
                   type="file"
@@ -470,6 +483,49 @@ export default function Home() {
                     Select a Spreadsheet to start
                   </h1>
                 )}
+                <Label>Student Pictures:</Label>
+                <Input
+                  type="file"
+                  name="images"
+                  onChange={onImagesChange}
+                  multiple
+                  accept="image/*"
+                ></Input>
+                <div>
+                  <Dialog open={isCropOpen}>
+                    <DialogTrigger asChild>
+                      <div className="flex flex-col w-full items-center justify-center">
+                        <Button
+                          className="my-2 "
+                          onClick={() => setIsCropOpen(true)}
+                        >
+                          Edit Image
+                        </Button>
+                        <h1>Image Scale:{photoStyle.scale.toFixed(2)}</h1>
+                        <Slider
+                          defaultValue={[photoStyle.scale]}
+                          max={5}
+                          onValueChange={(val) => {
+                            setPhotoStyle((state) => ({
+                              ...state,
+                              scale: val[0],
+                            }));
+                          }}
+                          step={0.01}
+                        ></Slider>
+                      </div>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <Cropper ref={cropperRef} src={photoImage}></Cropper>
+                      <Button onClick={() => onCrop()}>Crop</Button>
+                      <DialogClose asChild>
+                        <Button onClick={() => setIsCropOpen(false)}>
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                    </DialogContent>
+                  </Dialog>
+                </div>
                 <div>
                   <div className="flex flex-row justify-center items-center my-1">
                     <div>
@@ -488,6 +544,24 @@ export default function Home() {
                           checked={isCustomText}
                           onCheckedChange={() => {
                             setIsCustomText((state) => !state);
+                          }}
+                        ></Checkbox>
+                      </div>
+                    )}
+                    {dataSheet.length !== 0 && (
+                      <div>
+                        <Label>Male</Label>
+                        <Checkbox
+                          checked={isMale}
+                          onCheckedChange={() => {
+                            setIsMale((state) => !state);
+                            setDataSheet(
+                              baseSheet.filter(
+                                (val) =>
+                                  val[sexIndex].toLocaleUpperCase() ==
+                                  (!isMale ? "MALE" : "FEMALE")
+                              )
+                            );
                           }}
                         ></Checkbox>
                       </div>
@@ -541,44 +615,11 @@ export default function Home() {
                         <Accordion type="multiple">
                           <AccordionItem value="Photo">
                             <AccordionTrigger>
-                              Photo: x: {photoStyle.x} y: {photoStyle.y} scale:{" "}
-                              {photoStyle.scale}
+                              Photo: x: {photoStyle.x.toFixed(2)} y:{" "}
+                              {photoStyle.y.toFixed(2)} scale:
+                              {photoStyle.scale.toFixed(2)}
                             </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="flex flex-col gap-2">
-                                <Slider
-                                  defaultValue={[photoStyle.x]}
-                                  max={imageRes.height}
-                                  onValueChange={(val) => {
-                                    setPhotoStyle((state) => ({
-                                      ...state,
-                                      x: val[0],
-                                    }));
-                                  }}
-                                ></Slider>
-                                <Slider
-                                  defaultValue={[photoStyle.y]}
-                                  max={imageRes.height}
-                                  onValueChange={(val) => {
-                                    setPhotoStyle((state) => ({
-                                      ...state,
-                                      y: val[0],
-                                    }));
-                                  }}
-                                ></Slider>
-                                <Slider
-                                  defaultValue={[photoStyle.scale]}
-                                  max={5}
-                                  onValueChange={(val) => {
-                                    setPhotoStyle((state) => ({
-                                      ...state,
-                                      scale: val[0],
-                                    }));
-                                  }}
-                                  step={0.01}
-                                ></Slider>
-                              </div>
-                            </AccordionContent>
+                            <AccordionContent></AccordionContent>
                           </AccordionItem>
                           <AccordionItem value="lastName">
                             <AccordionTrigger>

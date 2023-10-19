@@ -94,6 +94,16 @@ export default function IDCanvas(
           return { ...val, x: val.x + 1 };
         });
         break;
+      case "+":
+        setPhotoStyle((val) => {
+          return { ...val, scale: val.scale + 0.05 };
+        });
+        break;
+      case "-":
+        setPhotoStyle((val) => {
+          return { ...val, scale: val.scale - 0.05 };
+        });
+        break;
       default:
         break;
     }
