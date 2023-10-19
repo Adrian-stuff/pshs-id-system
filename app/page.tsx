@@ -188,9 +188,9 @@ export default function Home() {
       stageRef.current.scaleX(1);
       stageRef.current.scaleY(1);
 
-      // const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-      // const blob = await dataURItoBlob(dataURL);
-      // addIdImage(blob);
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+      const blob = await dataURItoBlob(dataURL);
+      addIdImage(blob);
 
       console.log(index, dataSheet.length);
 
