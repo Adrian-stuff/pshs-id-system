@@ -1,10 +1,10 @@
 import JSZip from "jszip";
 import FileSaver from "file-saver";
-export const imageRes = { width: 2848, height: 2000 };
+export const imageRes = { width: 2628, height: 2022 };
 // TODO: finalize the sections
-const defaultSecStyle = {
+export const defaultSecStyle = {
   x: 0,
-  y: 1715,
+  y: 1750,
   fontSize: 60,
 };
 export const stemSections: {

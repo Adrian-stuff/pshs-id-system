@@ -3,10 +3,10 @@
 import URLImage from "@/app/UrlImage";
 import { Dispatch, KeyboardEvent, SetStateAction } from "react";
 import { Stage, Layer, Text } from "react-konva";
-import stemPhoto from "@/app/1.png";
-import humssPhoto from "@/app/2.png";
+import stemPhoto from "@/app/STEM.png";
+import humssPhoto from "@/app/HUMSS.png";
 
-import backImg from "@/app/3.png";
+import backImg from "@/app/BACK.png";
 export default function IDCanvas(
   stageRef: any,
   stageSize: { width: number; height: number; scaleX: number; scaleY: number },
@@ -58,7 +58,8 @@ export default function IDCanvas(
   adviserText: string,
   lrnIndex: number,
   lrnStyle: { x: number; y: number; fontSize: number },
-
+  birthDateText: string,
+  birthDateIndex: number,
   lastName: string,
   firstName: string,
   middleName: string,
@@ -119,7 +120,7 @@ export default function IDCanvas(
       >
         <Layer>
           <URLImage src={isStem ? stemPhoto.src : humssPhoto.src}></URLImage>
-          <URLImage src={backImg.src} x={1450}></URLImage>
+          <URLImage src={backImg.src} x={1350}></URLImage>
         </Layer>
         <Layer>
           <Text
@@ -140,7 +141,7 @@ export default function IDCanvas(
             shadowOffsetY={3}
             wrap="word"
             letterSpacing={3}
-            width={900}
+            width={800}
             fontFamily="Horizon"
           ></Text>
 
@@ -174,7 +175,7 @@ export default function IDCanvas(
             shadowOffsetY={3}
             letterSpacing={3}
             wrap="word"
-            width={900}
+            width={800}
             fontFamily="Horizon"
           ></Text>
           <Text
@@ -192,7 +193,7 @@ export default function IDCanvas(
             // shadowEnabled
             // shadowOffsetX={-4}
             // shadowOffsetY={4}
-            width={1414}
+            width={1275}
             fontFamily="Horizon"
           ></Text>
           <Text
@@ -210,7 +211,7 @@ export default function IDCanvas(
             align="center"
             fill="#fcffde"
             letterSpacing={13}
-            width={1414}
+            width={1275}
             fontFamily="Noto Serif"
           ></Text>
           <URLImage
@@ -244,7 +245,7 @@ export default function IDCanvas(
 
               caps: true,
             })?.trim()}
-            width={1200}
+            width={1000}
             align="center"
             fontFamily="Noto Serif"
           ></Text>
@@ -282,6 +283,20 @@ export default function IDCanvas(
             fontSize={adviserStyle.fontSize}
             text={adviserText.trim().length !== 0 ? adviserText : "ADVISER"}
             width={1000}
+            align="center"
+            fontStyle="bold"
+            fontFamily="Noto Serif"
+          ></Text>
+          <Text
+            y={1313}
+            x={218}
+            fontSize={45}
+            text={setOr({
+              indexValue: birthDateIndex,
+              customText: birthDateText,
+              defaultValue: "0000-00-00",
+            })}
+            width={300}
             align="center"
             fontStyle="bold"
             fontFamily="Noto Serif"

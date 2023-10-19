@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { zipAndDownloadImages, dataURItoBlob } from "./utils";
+import { zipAndDownloadImages, dataURItoBlob, defaultSecStyle } from "./utils";
 
 import { useDataSheetStore, useIdValuesStore, useImageStore } from "./store";
 import Konva from "konva";
@@ -108,16 +108,16 @@ export default function Home() {
   const [lastNameStyle, setLastNameStyle] = useState({
     x: 130,
     y: 600,
-    fontSize: 90,
+    fontSize: 110,
   });
   const [nameStyle, setNameStyle] = useState({
     x: 130,
     y: 712,
-    fontSize: 70,
+    fontSize: 90,
   });
-  const [secStyle, setSecStyle] = useState({ x: 0, y: 1715, fontSize: 60 });
+  const [secStyle, setSecStyle] = useState(defaultSecStyle);
   const [rdStyle, setRdStyle] = useState({ x: 160, y: 1800, fontSize: 56 });
-  const [lrnStyle, setLrnStyle] = useState({ x: 25, y: 1867, fontSize: 56 });
+  const [lrnStyle, setLrnStyle] = useState({ x: 5, y: 1909, fontSize: 55 });
 
   const [photoStyle, setPhotoStyle] = useState({
     x: 712,
@@ -127,23 +127,23 @@ export default function Home() {
     scale: 1.5,
   });
   const [guardianNameStyle, setGuardianNameStyle] = useState({
-    x: 1565,
-    y: 569,
+    x: 1490,
+    y: 578,
     fontSize: 56,
   });
   const [contactNumStyle, setContactNumStyle] = useState({
-    x: 1660,
-    y: 795,
+    x: 1490,
+    y: 815,
     fontSize: 56,
   });
   const [addressStyle, setAddressStyle] = useState({
-    x: 1660,
-    y: 1033,
+    x: 1490,
+    y: 1050,
     fontSize: 56,
   });
   const [adviserStyle, setAdviserStyle] = useState({
-    x: 1660,
-    y: 1345,
+    x: 1490,
+    y: 1310,
     fontSize: 56,
   });
   const [adviserText, setAdviserText] = useState("");
@@ -307,6 +307,8 @@ export default function Home() {
               adviserText,
               lrnIndex,
               lrnStyle,
+              birthDate,
+              birthDateIndex,
               lastName,
               firstName,
               middleName,
@@ -529,6 +531,41 @@ export default function Home() {
                           }}
                           step={0.01}
                         ></Slider>
+                        <div className="flex flex-row gap-2">
+                          <div className="w-20">
+                            <h1>Last name:</h1>
+                            <Input
+                              type="number"
+                              min={12}
+                              max={120}
+                              value={lastNameStyle.fontSize}
+                              onChange={(e) => {
+                                setLastNameStyle((state) => ({
+                                  ...state,
+                                  fontSize: +e.target.value,
+                                }));
+                                console.log(e.target.value);
+                              }}
+                            ></Input>
+                          </div>
+                          <div className="w-20">
+                            <h1>Name: </h1>
+
+                            <Input
+                              type="number"
+                              min={12}
+                              max={120}
+                              value={nameStyle.fontSize}
+                              onChange={(e) => {
+                                setNameStyle((state) => ({
+                                  ...state,
+                                  fontSize: +e.target.value,
+                                }));
+                                console.log(e.target.value);
+                              }}
+                            ></Input>
+                          </div>
+                        </div>
                       </div>
                     </DialogTrigger>
                     <DialogContent>
