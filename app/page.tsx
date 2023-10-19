@@ -348,38 +348,54 @@ export default function Home() {
                       <div className="flex flex-col gap-1">
                         {SelectField(
                           "Last Name",
+                          studentNameIndex.last,
                           setStudentLastNameIndex,
                           baseSheet
                         )}
                         {SelectField(
                           "First Name",
+                          studentNameIndex.first,
                           setStudentFirstNameIndex,
                           baseSheet
                         )}
                         {SelectField(
                           "Middle Name",
+                          studentNameIndex.middle,
                           setStudentMiddleNameIndex,
                           baseSheet
                         )}
                         {SelectField(
                           "Suffix",
+                          studentNameIndex.suffix,
                           setStudentSuffixIndex,
                           baseSheet
                         )}
                         {SelectField(
                           "Guardian Name",
+                          guardianNameIndex,
                           setGuardianNameIndex,
                           baseSheet
                         )}
                         {SelectField(
                           "Contact Number",
+                          contactNumberIndex,
                           setContactNumberIndex,
                           baseSheet
                         )}
-                        {SelectField("Address", setAddressIndex, baseSheet)}
-                        {SelectField("LRN", setLrnIndex, baseSheet)}
-                        {SelectField("Birthdate", setLrnIndex, baseSheet)}
-                        {SelectField("Sex", setSexIndex, baseSheet)}
+                        {SelectField(
+                          "Address",
+                          addressIndex,
+                          setAddressIndex,
+                          baseSheet
+                        )}
+                        {SelectField("LRN", lrnIndex, setLrnIndex, baseSheet)}
+                        {SelectField(
+                          "Birthdate",
+                          birthDateIndex,
+                          setBirthDateIndex,
+                          baseSheet
+                        )}
+                        {SelectField("Sex", sexIndex, setSexIndex, baseSheet)}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -450,7 +466,7 @@ export default function Home() {
                   onChange={onFileChange}
                   accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 />
-                {dataSheet.length !== 0 || isCustomText ? (
+                {baseSheet.length !== 0 || isCustomText ? (
                   <div>
                     <div className="flex flex-row justify-center gap-2 my-2">
                       <Button
@@ -537,7 +553,7 @@ export default function Home() {
                         }}
                       ></Checkbox>
                     </div>
-                    {dataSheet.length === 0 && (
+                    {baseSheet.length === 0 && (
                       <div>
                         <Label>Use Custom Text</Label>
                         <Checkbox
@@ -548,7 +564,7 @@ export default function Home() {
                         ></Checkbox>
                       </div>
                     )}
-                    {dataSheet.length !== 0 && (
+                    {baseSheet.length !== 0 && (
                       <div>
                         <Label>Male</Label>
                         <Checkbox

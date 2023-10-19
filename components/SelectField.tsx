@@ -10,11 +10,13 @@ import {
 
 export default function SelectField(
   name: string,
+  index: number | undefined,
   setIndex: (index: number) => void,
   dataSheet: string[][]
 ) {
   return (
     <Select
+      // defaultValue={dataSheet[0][index ?? 0].toString()}
       onValueChange={(val) => {
         setIndex(+val);
         console.log(+val);
