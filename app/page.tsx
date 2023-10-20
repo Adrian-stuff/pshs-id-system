@@ -153,7 +153,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    if (profileImages.length !== 0) {
+    if (profileImages.length !== 0 && dataSheet.length !== 0) {
       const profileFromName = profileImages.filter((val) => {
         return (
           val.name.split(".")[0].toLocaleUpperCase().toString().trim() ==
@@ -276,6 +276,7 @@ export default function Home() {
   const onImagesChange = (event: ChangeEvent<HTMLInputElement>): void => {
     if (event.target.files !== null) {
       console.log(event.target.files);
+
       addProfileImages(Array.from(event.target.files));
     }
   };
@@ -322,6 +323,7 @@ export default function Home() {
             )}
             <div className="grid grid-cols-5 max-w-xl gap-2">
               {profileImages.map((val, idx) => {
+                console.log(val);
                 const imageUrl = URL.createObjectURL(val);
                 return (
                   <button
