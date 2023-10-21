@@ -1,12 +1,19 @@
 import { create } from "zustand";
 
 interface IdImageState {
-  idImages: Blob[];
+  idImages: { blob: Blob; name: string }[];
   profileImages: File[];
-  addIdImage: (idImage: Blob) => void;
+  signatureImages: File[];
+
+  addIdImage: (idImage: { blob: Blob; name: string }) => void;
   addProfileImages: (image: File[]) => void;
+  addSignatureImages: (image: File[]) => void;
 }
 
+interface SignatureState {
+  signatureImages: { blob: Blob; name: string }[];
+  addSignatureImage: (signatureImage: { blob: Blob; name: string }) => void;
+}
 interface DataSheetState {
   dataSheet: string[][];
   baseSheet: string[][];
@@ -44,9 +51,21 @@ interface IdValuesState {
 export const useImageStore = create<IdImageState>((set) => ({
   idImages: [],
   profileImages: [],
-  addIdImage: (idImage) =>
+  signatureImages: [],
+
+  addIdImage: (idImage: { blob: Blob; name: string }) =>
     set((state) => ({ idImages: [...state.idImages, idImage] })),
   addProfileImages: (image) => set((state) => ({ profileImages: image })),
+  addSignatureImages: (image) => set((state) => ({ signatureImages: image })),
+}));
+
+export const useSignatureStore = create<SignatureState>((set) => ({
+  signatureImages: [],
+
+  addSignatureImage: (signatureImage: { blob: Blob; name: string }) =>
+    set((state) => ({
+      signatureImages: [...state.signatureImages, signatureImage],
+    })),
 }));
 
 export const useDataSheetStore = create<DataSheetState>((set) => ({

@@ -70,10 +70,28 @@ export default function IDCanvas(
   address: string,
 
   photoImage: string,
+  signatureImage: string,
+  signatureImageStyle: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    scale: number;
+  },
+  setSignatureStyle: Dispatch<
+    SetStateAction<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      scale: number;
+    }>
+  >,
   isStem: boolean
 ) {
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     console.log(e.key);
+    e.preventDefault();
     switch (e.key) {
       case "ArrowUp":
         setPhotoStyle((val) => {
@@ -233,6 +251,26 @@ export default function IDCanvas(
             scaleY={photoStyle.scale}
             draggable
             src={photoImage}
+          ></URLImage>
+          <URLImage
+            x={signatureImageStyle.x}
+            y={signatureImageStyle.y}
+            // width={signatureImageStyle.width}
+            // height={signatureImageStyle.height}
+            onDragEnd={(e) => {
+              setSignatureStyle((val) => {
+                return {
+                  ...val,
+                  x: e.currentTarget.x(),
+                  y: e.currentTarget.y(),
+                };
+              });
+              console.log(e.currentTarget.x());
+            }}
+            scaleX={signatureImageStyle.scale}
+            scaleY={signatureImageStyle.scale}
+            draggable
+            src={signatureImage}
           ></URLImage>
           <Text
             y={guardianNameStyle.y}

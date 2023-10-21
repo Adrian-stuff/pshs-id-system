@@ -45,18 +45,40 @@ export const humssSections: {
   { section: "11 - GABRIELA SILANG", ...defaultSecStyle },
 ];
 // Create a function to zip and download blob images
-export async function zipAndDownloadImages(
-  blobImages: Blob[],
+// export async function zipAndDownloadImages(
+//   blobImages: Blob[],
+//   zipFileName: string
+// ): Promise<void> {
+//   try {
+//     const zip = new JSZip();
+
+//     // Add each blob image to the zip file
+//     blobImages.forEach((blob, index) => {
+//       // Generate a unique file name for each image (e.g., image1.png, image2.png, ...)
+//       const fileName = `image${index + 1}.png`;
+//       zip.file(fileName, blob);
+//     });
+
+//     // Generate the zip file
+//     const zipBlob = await zip.generateAsync({ type: "blob" });
+
+//     // Trigger the download
+//     FileSaver.saveAs(zipBlob, zipFileName);
+//   } catch (error) {
+//     console.error("Error zipping and downloading images:", error);
+//   }
+// }
+export async function zipAndDownloadImagesWithNames(
+  imageObjects: { blob: Blob; name: string }[],
   zipFileName: string
 ): Promise<void> {
   try {
     const zip = new JSZip();
 
-    // Add each blob image to the zip file
-    blobImages.forEach((blob, index) => {
-      // Generate a unique file name for each image (e.g., image1.png, image2.png, ...)
-      const fileName = `image${index + 1}.png`;
-      zip.file(fileName, blob);
+    // Add each blob image to the zip file with custom names
+    imageObjects.forEach((imageObject, index) => {
+      const fileName = `${imageObject.name}.png`;
+      zip.file(fileName, imageObject.blob);
     });
 
     // Generate the zip file

@@ -10,7 +10,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { zipAndDownloadImages, dataURItoBlob, defaultSecStyle } from "./utils";
+import {
+  dataURItoBlob,
+  defaultSecStyle,
+  zipAndDownloadImagesWithNames,
+} from "./utils";
 
 import { useDataSheetStore, useIdValuesStore, useImageStore } from "./store";
 import Konva from "konva";
@@ -34,6 +38,8 @@ import SelectField from "@/components/SelectField";
 import { CropperRef, Cropper } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
 import smirk from "./smirk.png";
+import signature from "./tanagan e sign.png";
+
 import {
   Dialog,
   DialogContent,
@@ -79,6 +85,8 @@ export default function Home() {
 
   const [index, setIndex] = useState(1);
   const [photoImage, setPhotoImage] = useState(smirk.src);
+  const [signatureImage, setSignatureImage] = useState(signature.src);
+
   const { dataSheet, baseSheet, setDataSheet, setBaseSheet } =
     useDataSheetStore();
   const {
@@ -101,8 +109,14 @@ export default function Home() {
     setBirthDateIndex,
     setSexIndex,
   } = useIdValuesStore();
-  const { idImages, profileImages, addIdImage, addProfileImages } =
-    useImageStore();
+  const {
+    idImages,
+    profileImages,
+    signatureImages,
+    addIdImage,
+    addProfileImages,
+    addSignatureImages,
+  } = useImageStore();
 
   const stageRef = useRef<Konva.Stage>(null);
   const [lastNameStyle, setLastNameStyle] = useState({
@@ -125,6 +139,13 @@ export default function Home() {
     width: 1000,
     height: 1000,
     scale: 1.5,
+  });
+  const [signatureImageStyle, setSignatureImageStyle] = useState({
+    x: 218,
+    y: 1100,
+    width: 1000,
+    height: 1000,
+    scale: 0.6,
   });
   const [guardianNameStyle, setGuardianNameStyle] = useState({
     x: 1490,
@@ -153,6 +174,24 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
+    const handleKeyDown = (e: any) => {
+      // Check if the pressed key is one of the arrow keys (left, up, right, down)
+      if (["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(e.key)) {
+        // Prevent the default scrolling behavior
+        e.preventDefault();
+      }
+    };
+
+    // Add an event listener for keydown when the component mounts
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []); // Empty dependency array to ensure the effect runs only once
+
+  useEffect(() => {
     if (profileImages.length !== 0 && dataSheet.length !== 0) {
       const profileFromName = profileImages.filter((val) => {
         return (
@@ -171,6 +210,25 @@ export default function Home() {
       }
     }
   }, [profileImages, index, studentNameIndex]);
+  useEffect(() => {
+    if (signatureImages.length !== 0 && dataSheet.length !== 0) {
+      const signatureFromName = signatureImages.filter((val) => {
+        return (
+          val.name.split(".")[0].toLocaleUpperCase().toString().trim() ==
+          dataSheet[index][studentNameIndex.last ?? 0]
+            .toString()
+            .toLocaleUpperCase()
+            .trim()
+        );
+      });
+      if (signatureFromName.length !== 0) {
+        const imageUrl = URL.createObjectURL(signatureFromName[0]);
+
+        console.log(signatureFromName[0]);
+        setSignatureImage(imageUrl);
+      }
+    }
+  }, [signatureImages, index, studentNameIndex]);
 
   const generateImages = async () => {
     setIsGenerating(true);
@@ -190,7 +248,16 @@ export default function Home() {
 
       const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
       const blob = await dataURItoBlob(dataURL);
-      addIdImage(blob);
+      addIdImage({
+        blob,
+        name:
+          setOr({
+            caps: true,
+            customText: lastName,
+            defaultValue: "ID Image",
+            indexValue: studentNameIndex.last,
+          }) ?? "ID IMAGE",
+      });
 
       console.log(index, dataSheet.length);
 
@@ -280,7 +347,13 @@ export default function Home() {
       addProfileImages(Array.from(event.target.files));
     }
   };
+  const onSignatureChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (event.target.files !== null) {
+      console.log(event.target.files);
 
+      addSignatureImages(Array.from(event.target.files));
+    }
+  };
   return (
     <div>
       <div className="flex flex-col gap-2 mt-2 ml-2">
@@ -319,15 +392,19 @@ export default function Home() {
               contactNumber,
               address,
               photoImage,
+              signatureImage,
+              signatureImageStyle,
+              setSignatureImageStyle,
               isStem
             )}
+            <h1>student images:</h1>
             <div className="grid grid-cols-5 max-w-xl gap-2">
               {profileImages.map((val, idx) => {
-                console.log(val);
+                // console.log(val);
                 const imageUrl = URL.createObjectURL(val);
                 return (
                   <button
-                    className="flex flex-col items-center gap-1 max-w-[125px] "
+                    className="flex flex-col items-center gap-1 max-w-[125px] border-2"
                     onClick={() => {
                       console.log(idx);
                       setPhotoImage(imageUrl);
@@ -335,7 +412,28 @@ export default function Home() {
                     key={idx}
                   >
                     <img src={imageUrl} alt="" />
-                    <p className="text-center break-all">{val.name}</p>
+                    <p className="text-center break-all text-sm">{val.name}</p>
+                  </button>
+                );
+              })}
+            </div>
+            <h1 className="text-sm">signatures images:</h1>
+
+            <div className="grid grid-cols-5 max-w-xl gap-2">
+              {signatureImages.map((val, idx) => {
+                // console.log(val);
+                const imageUrl = URL.createObjectURL(val);
+                return (
+                  <button
+                    className="flex flex-col items-center justify-center border-2 rounded-lg max-w-[100px]"
+                    onClick={() => {
+                      console.log(idx);
+                      setSignatureImage(imageUrl);
+                    }}
+                    key={idx}
+                  >
+                    <img src={imageUrl} alt="" />
+                    <p className="text-center break-all text-sm">{val.name}</p>
                   </button>
                 );
               })}
@@ -487,7 +585,11 @@ export default function Home() {
                       </Button>
                       <Button
                         onClick={async () => {
-                          await zipAndDownloadImages(idImages, "ID Images");
+                          // await zipAndDownloadImages(idImages, "ID Images");
+                          await zipAndDownloadImagesWithNames(
+                            idImages,
+                            "ID IMAGES"
+                          );
                         }}
                       >
                         Download
@@ -511,6 +613,14 @@ export default function Home() {
                   multiple
                   accept="image/*"
                 ></Input>
+                <Label>Student Signatures:</Label>
+                <Input
+                  type="file"
+                  name="images"
+                  onChange={onSignatureChange}
+                  multiple
+                  accept="image/*"
+                ></Input>
                 <div>
                   <Dialog open={isCropOpen}>
                     <DialogTrigger asChild>
@@ -527,6 +637,20 @@ export default function Home() {
                           max={5}
                           onValueChange={(val) => {
                             setPhotoStyle((state) => ({
+                              ...state,
+                              scale: val[0],
+                            }));
+                          }}
+                          step={0.01}
+                        ></Slider>
+                        <h1>
+                          Signature Scale:{signatureImageStyle.scale.toFixed(2)}
+                        </h1>
+                        <Slider
+                          defaultValue={[signatureImageStyle.scale]}
+                          max={5}
+                          onValueChange={(val) => {
+                            setSignatureImageStyle((state) => ({
                               ...state,
                               scale: val[0],
                             }));
