@@ -37,8 +37,8 @@ import Sliders from "@/components/Sliders";
 import SelectField from "@/components/SelectField";
 import { CropperRef, Cropper } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
-import smirk from "./smirk.png";
-import signature from "./tanagan e sign.png";
+import chae from "./chae.png";
+import signature from "./Signature.png";
 
 import {
   Dialog,
@@ -84,7 +84,7 @@ export default function Home() {
   });
 
   const [index, setIndex] = useState(1);
-  const [photoImage, setPhotoImage] = useState(smirk.src);
+  const [photoImage, setPhotoImage] = useState(chae.src);
   const [signatureImage, setSignatureImage] = useState(signature.src);
 
   const { dataSheet, baseSheet, setDataSheet, setBaseSheet } =
@@ -121,12 +121,12 @@ export default function Home() {
   const stageRef = useRef<Konva.Stage>(null);
   const [lastNameStyle, setLastNameStyle] = useState({
     x: 130,
-    y: 600,
+    y: 500,
     fontSize: 110,
   });
   const [nameStyle, setNameStyle] = useState({
     x: 130,
-    y: 712,
+    y: 612,
     fontSize: 90,
   });
   const [secStyle, setSecStyle] = useState(defaultSecStyle);
@@ -138,7 +138,7 @@ export default function Home() {
     y: 470,
     width: 1000,
     height: 1000,
-    scale: 1.5,
+    scale: 0.8,
   });
   const [signatureImageStyle, setSignatureImageStyle] = useState({
     x: 218,

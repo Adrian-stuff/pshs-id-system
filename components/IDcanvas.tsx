@@ -159,7 +159,7 @@ export default function IDCanvas(
             shadowOffsetY={3}
             wrap="word"
             letterSpacing={3}
-            width={800}
+            width={850}
             fontFamily="Horizon"
           ></Text>
 
@@ -193,7 +193,7 @@ export default function IDCanvas(
             shadowOffsetY={3}
             letterSpacing={3}
             wrap="word"
-            width={800}
+            width={850}
             fontFamily="Horizon"
           ></Text>
           <Text
