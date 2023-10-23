@@ -85,7 +85,7 @@ export default function Home() {
 
   const [index, setIndex] = useState(1);
   const [photoImage, setPhotoImage] = useState(chae.src);
-  const [signatureImage, setSignatureImage] = useState(signature.src);
+  const [signatureImage, setSignatureImage] = useState("");
 
   const { dataSheet, baseSheet, setDataSheet, setBaseSheet } =
     useDataSheetStore();
@@ -172,6 +172,7 @@ export default function Home() {
   const [isStem, setIsStem] = useState(true);
   const [isDone, setIsDone] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isMale, setIsMale] = useState(true);
 
   useEffect(() => {
     const handleKeyDown = (e: any) => {
@@ -229,7 +230,18 @@ export default function Home() {
       }
     }
   }, [signatureImages, index, studentNameIndex]);
-
+  useEffect(() => {
+    if (baseSheet.length !== 0) {
+      setDataSheet(
+        baseSheet.filter((val) => {
+          return (
+            (val[sexIndex] ?? "").toLocaleUpperCase() ==
+            (isMale ? "MALE" : "FEMALE")
+          );
+        })
+      );
+    }
+  }, [isMale, baseSheet]);
   const generateImages = async () => {
     setIsGenerating(true);
     if (stageRef.current !== null && !isDone) {
@@ -301,7 +313,6 @@ export default function Home() {
     }
   };
   const [isCustomText, setIsCustomText] = useState(false);
-  const [isMale, setIsMale] = useState(true);
 
   const [lastName, setLastName] = useState("last_name");
   const [firstName, setFirstName] = useState("first_name");
@@ -621,16 +632,28 @@ export default function Home() {
                   multiple
                   accept="image/*"
                 ></Input>
+
                 <div>
                   <Dialog open={isCropOpen}>
                     <DialogTrigger asChild>
                       <div className="flex flex-col w-full items-center justify-center">
-                        <Button
-                          className="my-2 "
-                          onClick={() => setIsCropOpen(true)}
-                        >
-                          Edit Image
-                        </Button>
+                        <div className="flex flex-row gap-2 justify-center items-center">
+                          <Button
+                            className="my-2 "
+                            onClick={() => setIsCropOpen(true)}
+                          >
+                            Crop Image
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setSignatureImage("");
+                              console.log("gell");
+                            }}
+                          >
+                            Remove Current Signature
+                          </Button>
+                        </div>
+
                         <h1>Image Scale:{photoStyle.scale.toFixed(2)}</h1>
                         <Slider
                           defaultValue={[photoStyle.scale]}
@@ -734,13 +757,6 @@ export default function Home() {
                           checked={isMale}
                           onCheckedChange={() => {
                             setIsMale((state) => !state);
-                            setDataSheet(
-                              baseSheet.filter(
-                                (val) =>
-                                  val[sexIndex].toLocaleUpperCase() ==
-                                  (!isMale ? "MALE" : "FEMALE")
-                              )
-                            );
                           }}
                         ></Checkbox>
                       </div>

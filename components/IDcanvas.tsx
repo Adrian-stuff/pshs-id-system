@@ -252,26 +252,28 @@ export default function IDCanvas(
             draggable
             src={photoImage}
           ></URLImage>
-          <URLImage
-            x={signatureImageStyle.x}
-            y={signatureImageStyle.y}
-            // width={signatureImageStyle.width}
-            // height={signatureImageStyle.height}
-            onDragEnd={(e) => {
-              setSignatureStyle((val) => {
-                return {
-                  ...val,
-                  x: e.currentTarget.x(),
-                  y: e.currentTarget.y(),
-                };
-              });
-              console.log(e.currentTarget.x());
-            }}
-            scaleX={signatureImageStyle.scale}
-            scaleY={signatureImageStyle.scale}
-            draggable
-            src={signatureImage}
-          ></URLImage>
+          {signatureImage.length !== 0 && (
+            <URLImage
+              x={signatureImageStyle.x}
+              y={signatureImageStyle.y}
+              // width={signatureImageStyle.width}
+              // height={signatureImageStyle.height}
+              onDragEnd={(e) => {
+                setSignatureStyle((val) => {
+                  return {
+                    ...val,
+                    x: e.currentTarget.x(),
+                    y: e.currentTarget.y(),
+                  };
+                });
+                console.log(e.currentTarget.x());
+              }}
+              scaleX={signatureImageStyle.scale}
+              scaleY={signatureImageStyle.scale}
+              draggable
+              src={signatureImage}
+            ></URLImage>
+          )}
           <Text
             y={guardianNameStyle.y}
             x={guardianNameStyle.x}

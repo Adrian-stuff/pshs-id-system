@@ -20,8 +20,8 @@ export const stemSections: {
   {
     section: "11 - DIOSDADO BANATAO",
     ...defaultSecStyle,
-    x: -10,
-    fontSize: 56,
+    // x: -10,
+    // fontSize: 56,
   },
   { section: "11 - GREGORIO ZARA", ...defaultSecStyle },
   { section: "11 - FE DEL MUNDO", ...defaultSecStyle },
