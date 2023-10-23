@@ -15,11 +15,15 @@ const Signature = () => {
   const [index, setIndex] = useState(1);
   const [isMale, setIsMale] = useState(true);
   function getCurrentDimension() {
-    return {
-      width: window.innerWidth - 20,
-      height: window.innerHeight - 100,
-    };
+    if (typeof window !== "undefined") {
+      return {
+        width: window.innerWidth - 20,
+        height: window.innerHeight - 100,
+      };
+    }
+    return { width: 500, height: 500 };
   }
+
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [sheet, setSheet] = useState<string[][]>([]);
   const [baseSheet, setBaseSheet] = useState<string[][]>([]);
@@ -92,7 +96,15 @@ const Signature = () => {
   //     });
   //   }
   // }, [signatureRef]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [resizeCanvas, setResizeCanvas] = useState(false);
 
+  useEffect(() => {
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      setIsMobile(true);
+    }
+    setScreenSize(getCurrentDimension());
+  }, [resizeCanvas]);
   useEffect(() => {
     clear();
   }, [signatureImages]);
@@ -131,7 +143,12 @@ const Signature = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <h1 className="font-bold text-3xl">Signature</h1>
+      <h1
+        className="font-bold text-3xl"
+        onClick={() => setResizeCanvas((state) => !state)}
+      >
+        Signature
+      </h1>
       <h1 className="font-bold text-2xl">
         {sheet.length !== 0 ? sheet[index][lastNameIndex] : "Enter Spreadsheet"}
       </h1>
@@ -166,9 +183,7 @@ const Signature = () => {
           penColor="black"
           canvasProps={{
             width: screenSize.width,
-            height: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-              ? screenSize.height
-              : 500,
+            height: isMobile ? screenSize.height : 500,
             className: "sigCanvas bg-transparent border border-black",
           }}
         ></SignatureCanvas>
