@@ -15,7 +15,13 @@ const Signature = () => {
   const { signatureImages, addSignatureImage } = useSignatureStore();
   const [index, setIndex] = useState(1);
   const [isMale, setIsMale] = useState(true);
-
+  function getCurrentDimension() {
+    return {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+  }
+  const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [sheet, setSheet] = useState<string[][]>([]);
   const [baseSheet, setBaseSheet] = useState<string[][]>([]);
 
@@ -24,7 +30,9 @@ const Signature = () => {
   const done = async () => {
     console.log("done");
     if (signatureRef.current !== null) {
-      const blob = await dataURItoBlob(signatureRef.current.toDataURL());
+      const blob = await dataURItoBlob(
+        signatureRef.current.getTrimmedCanvas().toDataURL()
+      );
       addSignatureImage({
         blob,
         name:
@@ -67,6 +75,16 @@ const Signature = () => {
       await zipAndDownloadImagesWithNames(signatureImages, "SIGNATURES");
     }
   };
+  useEffect(() => {
+    const updateDimension = () => {
+      setScreenSize(getCurrentDimension());
+    };
+    window.addEventListener("resize", updateDimension);
+
+    return () => {
+      window.removeEventListener("resize", updateDimension);
+    };
+  }, [screenSize]);
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       <h1 className="font-bold text-3xl">Signature</h1>
@@ -105,14 +123,14 @@ const Signature = () => {
         accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       />
 
-      <div className="border border-black">
+      <div className="flex items-center">
         <SignatureCanvas
           ref={signatureRef}
           penColor="black"
           canvasProps={{
-            width: 500,
-            height: 200,
-            className: "sigCanvas bg-transparent",
+            width: screenSize.width - 50,
+            height: 500,
+            className: "sigCanvas bg-transparent border border-black",
           }}
         ></SignatureCanvas>
       </div>
