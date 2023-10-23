@@ -16,14 +16,14 @@ const Signature = () => {
   const [isMale, setIsMale] = useState(true);
   function getCurrentDimension() {
     return {
-      width: window.innerWidth - 50,
+      width: window.innerWidth - 20,
       height: window.innerHeight - 100,
     };
   }
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [sheet, setSheet] = useState<string[][]>([]);
   const [baseSheet, setBaseSheet] = useState<string[][]>([]);
-  const [lastNameIndex, setLastNameIndex] = useState(1);
+  const [lastNameIndex, setLastNameIndex] = useState(0);
   const [sexIndex, setSexIndex] = useState(8);
   const done = async () => {
     console.log("done");
