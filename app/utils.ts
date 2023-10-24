@@ -68,6 +68,13 @@ export const humssSections: {
 //     console.error("Error zipping and downloading images:", error);
 //   }
 // }
+export async function downloadImage(imageBlob: Blob, name: string) {
+  try {
+    FileSaver.saveAs(imageBlob, `${name}.png`);
+  } catch (error) {
+    console.error(error);
+  }
+}
 export async function zipAndDownloadImagesWithNames(
   imageObjects: { blob: Blob; name: string }[],
   zipFileName: string

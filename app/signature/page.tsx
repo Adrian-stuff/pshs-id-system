@@ -2,29 +2,42 @@
 import { Button } from "@/components/ui/button";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { dataURItoBlob, zipAndDownloadImagesWithNames } from "../utils";
+import {
+  dataURItoBlob,
+  downloadImage,
+  zipAndDownloadImagesWithNames,
+} from "../utils";
 import SelectField from "@/components/SelectField";
 import { useSignatureStore } from "../store";
 import { read, utils } from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useRouter } from "next/router";
+import { useLeavePageConfirm } from "./useLeavePageConfirm";
+
 const Signature = () => {
+  useLeavePageConfirm();
+
   const signatureRef = useRef<SignatureCanvas>(null);
   const { signatureImages, addSignatureImage } = useSignatureStore();
-  const [index, setIndex] = useState(1);
+  const [index, setIndex] = useState(0);
   const [isMale, setIsMale] = useState(true);
-  function getCurrentDimension() {
-    if (typeof window !== "undefined") {
-      return {
-        width: window.innerWidth - 20,
-        height: window.innerHeight - 100,
-      };
-    }
-    return { width: 500, height: 500 };
-  }
+  const [imageText, setImageText] = useState("Signature");
 
-  const [screenSize, setScreenSize] = useState(getCurrentDimension());
+  const [screenSize, setScreenSize] = useState<{
+    width: number | undefined;
+    height: number | undefined;
+  }>({
+    width: undefined,
+    height: undefined,
+  });
   const [sheet, setSheet] = useState<string[][]>([]);
   const [baseSheet, setBaseSheet] = useState<string[][]>([]);
   const [lastNameIndex, setLastNameIndex] = useState(0);
@@ -42,13 +55,25 @@ const Signature = () => {
             ? sheet[index][lastNameIndex].trim().toLocaleUpperCase()
             : "Signature",
       });
-      setIndex((state) => state + 1);
+      if (index < sheet.length - 1) {
+        setIndex((state) => state + 1);
+      }
+
       // signatureRef.current.clear();
+    }
+  };
+  const doneImage = async () => {
+    if (signatureRef.current !== null) {
+      const blob = await dataURItoBlob(
+        signatureRef.current.getTrimmedCanvas().toDataURL()
+      );
+      downloadImage(blob, imageText);
+      clear();
     }
   };
   const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
     if (evt.target.files !== null) {
-      setIndex(1);
+      setIndex(0);
       console.log(evt.target.files[0]);
       const spreadsheet = read(await evt.target.files[0].arrayBuffer(), {
         type: "buffer",
@@ -74,61 +99,30 @@ const Signature = () => {
       await zipAndDownloadImagesWithNames(signatureImages, "SIGNATURES");
     }
   };
-  // useEffect(() => {
-  //   const canvas = document.querySelector(".sigCanvas");
-  //   if (canvas) {
-  //     let clickCount = 0;
-  //     let timeout: NodeJS.Timeout;
-  //     canvas.addEventListener("click", () => {
-  //       if (timeout) {
-  //         clearTimeout(timeout);
-  //       }
-  //       clickCount++;
 
-  //       if (clickCount === 2) {
-  //         clear();
-
-  //         clickCount = 0;
-  //       }
-  //       timeout = setTimeout(() => {
-  //         clickCount = 0;
-  //       }, 300);
-  //     });
-  //   }
-  // }, [signatureRef]);
-  const [isMobile, setIsMobile] = useState(false);
-  const [resizeCanvas, setResizeCanvas] = useState(false);
-
-  useEffect(() => {
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      setIsMobile(true);
-    }
-    setScreenSize(getCurrentDimension());
-  }, [resizeCanvas]);
-  useEffect(() => {
-    clear();
-  }, [signatureImages]);
   useEffect(() => {
     const updateDimension = () => {
-      setScreenSize(getCurrentDimension());
+      setScreenSize({ width: window.innerWidth, height: window.innerHeight });
     };
+    console.log(screenSize);
+    updateDimension();
     window.addEventListener("resize", updateDimension);
-    window.addEventListener("keydown", (e) => {
-      e.preventDefault();
-      if (e.key == " ") {
-        console.log("space");
-        clear();
-      }
-      // else if (e.key == "a") {
-      //   console.log("he");
-      //   done();
-      // }
-      console.log(e.key);
-    });
+    // window.addEventListener("keydown", (e) => {
+    //   // if (e.key == " ") {
+    //   //   e.preventDefault();
+    //   //   console.log("space");
+    //   //   clear();
+    //   // }
+
+    //   console.log(e.key);
+    // });
     return () => {
       window.removeEventListener("resize", updateDimension);
     };
-  }, [screenSize]);
+  }, []);
+  useEffect(() => {
+    clear();
+  }, [signatureImages]);
   useEffect(() => {
     if (baseSheet.length !== 0) {
       setSheet(
@@ -143,55 +137,85 @@ const Signature = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <h1
-        className="font-bold text-3xl"
-        onClick={() => setResizeCanvas((state) => !state)}
-      >
-        Signature
-      </h1>
+      <div className="flex flex-row items-center justify-center gap-2">
+        <h1 className="font-bold text-3xl">Signature</h1>
+        <Button className="" onClick={download}>
+          Download all
+        </Button>
+      </div>
       <h1 className="font-bold text-2xl">
         {sheet.length !== 0 ? sheet[index][lastNameIndex] : "Enter Spreadsheet"}
       </h1>
-      {sheet.length !== 0 && (
-        <div>
-          {SelectField("Last Name", lastNameIndex, setLastNameIndex, baseSheet)}
-          {SelectField("Sex", sexIndex, setSexIndex, baseSheet)}
-        </div>
-      )}
-      {sheet.length !== 0 && (
-        <div>
-          <Label>Male</Label>
-          <Checkbox
-            checked={isMale}
-            onCheckedChange={() => {
-              setIsMale((state) => !state);
-            }}
-          ></Checkbox>
-        </div>
-      )}
-      <Input
-        type="file"
-        name="data"
-        id="data"
-        onChange={onFileChange}
-        accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      />
-
-      <div className="flex items-center">
-        <SignatureCanvas
-          ref={signatureRef}
-          penColor="black"
-          canvasProps={{
-            width: screenSize.width,
-            height: isMobile ? screenSize.height : 500,
-            className: "sigCanvas bg-transparent border border-black",
-          }}
-        ></SignatureCanvas>
+      <div className="flex flex-row w-sm">
+        <Input
+          type="text"
+          value={imageText}
+          onChange={(e) => setImageText(e.target.value.toLocaleUpperCase())}
+        ></Input>
       </div>
-      <div className="flex justify-center items-center flex-row gap-2">
-        <Button onClick={done}>Done</Button>
+      <Accordion className="mt-[-20px] pb-[-15px]" type="single" collapsible>
+        <AccordionItem value="Open">
+          <AccordionTrigger>Open Input</AccordionTrigger>
+
+          <AccordionContent>
+            {sheet.length !== 0 && (
+              <div>
+                {SelectField(
+                  "Last Name",
+                  lastNameIndex,
+                  setLastNameIndex,
+                  baseSheet
+                )}
+                {SelectField("Sex", sexIndex, setSexIndex, baseSheet)}
+              </div>
+            )}
+            {sheet.length !== 0 && (
+              <div>
+                <Label>Male</Label>
+                <Checkbox
+                  checked={isMale}
+                  onCheckedChange={() => {
+                    setIsMale((state) => !state);
+                  }}
+                ></Checkbox>
+              </div>
+            )}
+            <div className="flex flex-row gap-2">
+              <Input
+                type="file"
+                name="data"
+                id="data"
+                onChange={onFileChange}
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {screenSize.width !== undefined ? (
+        <div className="flex items-center">
+          <SignatureCanvas
+            ref={signatureRef}
+            penColor="black"
+            minWidth={1.5}
+            canvasProps={{
+              width: screenSize.width - 10,
+              height: 300,
+              className: "sigCanvas bg-transparent border border-black",
+            }}
+          ></SignatureCanvas>
+        </div>
+      ) : (
+        <h1>Loading</h1>
+      )}
+      <div className="flex justify-center items-center flex-row gap-2 mt-5 h-10">
+        <Button className="" onClick={doneImage}>
+          Download Image
+        </Button>
+
         <Button onClick={clear}>Clear</Button>
-        <Button onClick={download}>Download all Signatures</Button>
+        <Button onClick={done}>Done</Button>
       </div>
       <div className="flex justify-center items-center gap-2 flex-wrap">
         {signatureImages.map((val, idx) => {
