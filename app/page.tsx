@@ -18,6 +18,7 @@ import {
 
 import { useDataSheetStore, useIdValuesStore, useImageStore } from "./store";
 import Konva from "konva";
+import { useLeavePageConfirm } from "./signature/useLeavePageConfirm";
 
 import { read, utils } from "xlsx";
 import {
@@ -38,6 +39,7 @@ import SelectField from "@/components/SelectField";
 import { CropperRef, Cropper } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
 import chae from "./chae.png";
+import defaultImage from "./defaultImage.png";
 import signature from "./Signature.png";
 
 import {
@@ -74,6 +76,8 @@ function capitalizeWords(input: string): string {
 }
 
 export default function Home() {
+  useLeavePageConfirm();
+
   const [stageSize] = useState({
     width: imageRes.width * 0.3,
     height: imageRes.height * 0.3,
@@ -84,7 +88,7 @@ export default function Home() {
   });
 
   const [index, setIndex] = useState(1);
-  const [photoImage, setPhotoImage] = useState(chae.src);
+  const [photoImage, setPhotoImage] = useState(defaultImage.src);
   const [signatureImage, setSignatureImage] = useState("");
 
   const { dataSheet, baseSheet, setDataSheet, setBaseSheet } =
@@ -173,11 +177,10 @@ export default function Home() {
   const [isDone, setIsDone] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isMale, setIsMale] = useState(true);
-
   useEffect(() => {
     const handleKeyDown = (e: any) => {
       // Check if the pressed key is one of the arrow keys (left, up, right, down)
-      if (["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(e.key)) {
+      if (["ArrowUp", "ArrowDown"].includes(e.key)) {
         // Prevent the default scrolling behavior
         e.preventDefault();
       }

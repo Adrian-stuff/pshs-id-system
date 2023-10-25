@@ -147,7 +147,7 @@ export default function IDCanvas(
             fontSize={lastNameStyle.fontSize}
             text={`${setOr({
               indexValue: studentNameIndex.last,
-              defaultValue: "STUDENT_NAME",
+              defaultValue: "DELA CRUZ",
               caps: true,
               customText: lastName,
             })?.trim()},`}
@@ -158,8 +158,8 @@ export default function IDCanvas(
             shadowOffsetX={-2}
             shadowOffsetY={3}
             wrap="word"
-            letterSpacing={3}
-            width={850}
+            letterSpacing={2}
+            width={1100}
             fontFamily="Horizon"
           ></Text>
 
@@ -169,13 +169,13 @@ export default function IDCanvas(
             fontSize={nameStyle.fontSize}
             text={`${setOr({
               indexValue: studentNameIndex.first,
-              defaultValue: "FIRST_NAME",
+              defaultValue: "JUAN",
               customText: firstName,
 
               caps: true,
             })} ${setOr({
               indexValue: studentNameIndex.middle,
-              defaultValue: "",
+              defaultValue: "M.",
               customText: middleName,
 
               caps: true,
@@ -220,7 +220,7 @@ export default function IDCanvas(
             fontSize={lrnStyle.fontSize}
             text={`LRN: ${setOr({
               indexValue: lrnIndex,
-              defaultValue: "LRN",
+              defaultValue: "123456789012",
               customText: lrn,
 
               caps: true,
@@ -280,7 +280,7 @@ export default function IDCanvas(
             fontSize={guardianNameStyle.fontSize}
             text={setOr({
               indexValue: guardianNameIndex,
-              defaultValue: "GUARDIAN_NAME",
+              defaultValue: "JUAN DELA CRUZ",
               customText: guardian,
 
               caps: true,
@@ -297,7 +297,7 @@ export default function IDCanvas(
               indexValue: contactNumberIndex,
               customText: contactNumber,
 
-              defaultValue: "CONTACT_NUMBER",
+              defaultValue: "123456789",
             })}
             width={1000}
             align="center"
@@ -311,7 +311,7 @@ export default function IDCanvas(
               indexValue: addressIndex,
               customText: address,
 
-              defaultValue: "ADDRESS",
+              defaultValue: "sapang bulak",
             })}
             width={1000}
             align="center"
