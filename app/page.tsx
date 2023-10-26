@@ -57,6 +57,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import Link from "next/link";
 function capitalizeWords(input: string): string {
   // Split the input string into words
   const words = input.toLowerCase().split(" ");
@@ -411,7 +412,21 @@ export default function Home() {
               setSignatureImageStyle,
               isStem
             )}
-            <h1>student images:</h1>
+            <div className="flex flex-row gap-10 items-center">
+              <h1>Student Pictures: </h1>
+              <div>
+                <Input
+                  type="file"
+                  name="images"
+                  onChange={onImagesChange}
+                  multiple
+                  accept="image/*"
+                ></Input>
+              </div>
+              <div className="justify-center items-center">
+                <Button onClick={() => setIsCropOpen(true)}>Crop Image</Button>
+              </div>
+            </div>
             <div className="grid grid-cols-5 max-w-xl gap-2">
               {profileImages.map((val, idx) => {
                 // console.log(val);
@@ -431,7 +446,28 @@ export default function Home() {
                 );
               })}
             </div>
-            <h1 className="text-sm">signatures images:</h1>
+            <div className="flex flex-row gap-10 items-center">
+              <h1 className="text-sm ">Signature Pictures:</h1>
+              <div>
+                <Input
+                  type="file"
+                  name="images"
+                  onChange={onSignatureChange}
+                  multiple
+                  accept="image/*"
+                ></Input>
+              </div>
+              <div className="justify-center items-center">
+                <Button
+                  onClick={() => {
+                    setSignatureImage("");
+                    console.log("gell");
+                  }}
+                >
+                  Remove Current Signature
+                </Button>{" "}
+              </div>
+            </div>
 
             <div className="grid grid-cols-5 max-w-xl gap-2">
               {signatureImages.map((val, idx) => {
@@ -539,6 +575,11 @@ export default function Home() {
                           setCustomText={setMiddleName}
                         />
                         <CustomTextField
+                          name="Suffix"
+                          value={suffix}
+                          setCustomText={setSuffix}
+                        />
+                        <CustomTextField
                           name="LRN"
                           value={lrn}
                           setCustomText={setLRN}
@@ -547,11 +588,6 @@ export default function Home() {
                           name="Birthdate"
                           value={birthDate}
                           setCustomText={setBirthDate}
-                        />
-                        <CustomTextField
-                          name="Suffix"
-                          value={suffix}
-                          setCustomText={setSuffix}
                         />
                         <CustomTextField
                           name="Guardian"
@@ -619,44 +655,11 @@ export default function Home() {
                     Select a Spreadsheet to start
                   </h1>
                 )}
-                <Label>Student Pictures:</Label>
-                <Input
-                  type="file"
-                  name="images"
-                  onChange={onImagesChange}
-                  multiple
-                  accept="image/*"
-                ></Input>
-                <Label>Student Signatures:</Label>
-                <Input
-                  type="file"
-                  name="images"
-                  onChange={onSignatureChange}
-                  multiple
-                  accept="image/*"
-                ></Input>
 
                 <div>
                   <Dialog open={isCropOpen}>
                     <DialogTrigger asChild>
                       <div className="flex flex-col w-full items-center justify-center">
-                        <div className="flex flex-row gap-2 justify-center items-center">
-                          <Button
-                            className="my-2 "
-                            onClick={() => setIsCropOpen(true)}
-                          >
-                            Crop Image
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setSignatureImage("");
-                              console.log("gell");
-                            }}
-                          >
-                            Remove Current Signature
-                          </Button>
-                        </div>
-
                         <h1>Image Scale:{photoStyle.scale.toFixed(2)}</h1>
                         <Slider
                           defaultValue={[photoStyle.scale]}
@@ -685,7 +688,7 @@ export default function Home() {
                         ></Slider>
                         <div className="flex flex-row gap-2">
                           <div className="w-20">
-                            <h1>Last name:</h1>
+                            <h1 className="text-sm">Last name:</h1>
                             <Input
                               type="number"
                               min={12}
@@ -701,7 +704,7 @@ export default function Home() {
                             ></Input>
                           </div>
                           <div className="w-20">
-                            <h1>Name: </h1>
+                            <h1 className="text-sm">Name: </h1>
 
                             <Input
                               type="number"
@@ -721,7 +724,11 @@ export default function Home() {
                       </div>
                     </DialogTrigger>
                     <DialogContent>
-                      <Cropper ref={cropperRef} src={photoImage}></Cropper>
+                      <Cropper
+                        ref={cropperRef}
+                        boundaryClassName="h-[500px]"
+                        src={photoImage}
+                      ></Cropper>
                       <Button onClick={() => onCrop()}>Crop</Button>
                       <DialogClose asChild>
                         <Button onClick={() => setIsCropOpen(false)}>
@@ -905,7 +912,18 @@ export default function Home() {
           </div> */}
         </div>
       </div>
-      <footer className="text-center">Made by ICT Club</footer>
+      <footer className="text-center flex flex-col">
+        Made by ICT Club{" "}
+        <Link href={"/signature"} className="underline">
+          go to signature page
+        </Link>
+        <Link
+          href={"https://adrian-stuff.github.io/id-pdf-generator/"}
+          className="underline"
+        >
+          go to printing page
+        </Link>
+      </footer>
     </div>
   );
 }

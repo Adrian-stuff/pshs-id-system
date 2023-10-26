@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import FileSaver from "file-saver";
 export const imageRes = { width: 2628, height: 2022 };
+// gap of image is 75 px
 // TODO: finalize the sections
 export const defaultSecStyle = {
   x: 0,
@@ -70,7 +71,7 @@ export const humssSections: {
 // }
 export async function downloadImage(imageBlob: Blob, name: string) {
   try {
-    FileSaver.saveAs(imageBlob, `${name}.png`);
+    FileSaver.saveAs(imageBlob, `${name.trim()}.png`);
   } catch (error) {
     console.error(error);
   }
@@ -84,7 +85,7 @@ export async function zipAndDownloadImagesWithNames(
 
     // Add each blob image to the zip file with custom names
     imageObjects.forEach((imageObject, index) => {
-      const fileName = `${imageObject.name}.png`;
+      const fileName = `${imageObject.name.trim()}.png`;
       zip.file(fileName, imageObject.blob);
     });
 
