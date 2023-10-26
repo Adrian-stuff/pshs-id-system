@@ -91,6 +91,7 @@ export default function Home() {
   const [index, setIndex] = useState(1);
   const [photoImage, setPhotoImage] = useState(defaultImage.src);
   const [signatureImage, setSignatureImage] = useState("");
+  const [tcSignatureImage, setTcSignatureImage] = useState("");
 
   const { dataSheet, baseSheet, setDataSheet, setBaseSheet } =
     useDataSheetStore();
@@ -148,6 +149,13 @@ export default function Home() {
   const [signatureImageStyle, setSignatureImageStyle] = useState({
     x: 218,
     y: 1100,
+    width: 1000,
+    height: 1000,
+    scale: 0.6,
+  });
+  const [tcSignatureImageStyle, setTcSignatureImageStyle] = useState({
+    x: 1920,
+    y: 1250,
     width: 1000,
     height: 1000,
     scale: 0.6,
@@ -249,7 +257,7 @@ export default function Home() {
   const generateImages = async () => {
     setIsGenerating(true);
     if (stageRef.current !== null && !isDone) {
-      if (index + 1 === dataSheet.length) {
+      if (index === dataSheet.length - 1) {
         console.log("done");
         setIsDone(true);
       }
@@ -291,9 +299,9 @@ export default function Home() {
   };
 
   const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
-    if (evt.target.files !== null) {
+    if (evt.target.files !== null && evt.target.files.length !== 0) {
       setIsCustomText(false);
-      setIndex(1);
+      setIndex(0);
       setIsDone(false);
       console.log(evt.target.files[0]);
       const spreadsheet = read(await evt.target.files[0].arrayBuffer(), {
@@ -356,14 +364,14 @@ export default function Home() {
     return result;
   };
   const onImagesChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    if (event.target.files !== null) {
+    if (event.target.files !== null && event.target.files.length !== 0) {
       console.log(event.target.files);
 
       addProfileImages(Array.from(event.target.files));
     }
   };
   const onSignatureChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    if (event.target.files !== null) {
+    if (event.target.files !== null && event.target.files.length !== 0) {
       console.log(event.target.files);
 
       addSignatureImages(Array.from(event.target.files));
@@ -410,6 +418,9 @@ export default function Home() {
               signatureImage,
               signatureImageStyle,
               setSignatureImageStyle,
+              tcSignatureImage,
+              tcSignatureImageStyle,
+              setTcSignatureImageStyle,
               isStem
             )}
             <div className="flex flex-row gap-10 items-center">
@@ -773,6 +784,32 @@ export default function Home() {
                     )}
                   </div>
                   <div className="my-1 flex flex-col gap-1">
+                    <div className="flex flex-row items-center justify-between ">
+                      <Label>Teacher's Signature:</Label>
+                      <Input
+                        type="number"
+                        value={tcSignatureImageStyle.scale}
+                        max={5}
+                        step={0.1}
+                        onChange={(e) => {
+                          setTcSignatureImageStyle((state) => ({
+                            ...state,
+                            scale: +e.target.value,
+                          }));
+                        }}
+                      ></Input>
+                    </div>
+                    <Input
+                      type="file"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files && files.length !== 0) {
+                          const img = URL.createObjectURL(files[0]);
+
+                          setTcSignatureImage(img);
+                        }
+                      }}
+                    ></Input>
                     <Input
                       type="text"
                       placeholder="Adviser Name:"

@@ -87,6 +87,24 @@ export default function IDCanvas(
       scale: number;
     }>
   >,
+  tcSignatureImage: string,
+
+  tcSignatureImageStyle: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    scale: number;
+  },
+  setTcSignatureStyle: Dispatch<
+    SetStateAction<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      scale: number;
+    }>
+  >,
   isStem: boolean
 ) {
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -272,6 +290,28 @@ export default function IDCanvas(
               scaleY={signatureImageStyle.scale}
               draggable
               src={signatureImage}
+            ></URLImage>
+          )}
+          {tcSignatureImage.length !== 0 && (
+            <URLImage
+              x={tcSignatureImageStyle.x}
+              y={tcSignatureImageStyle.y}
+              // width={tcSignatureImageStyle.width}
+              // height={tcSignatureImageStyle.height}
+              onDragEnd={(e) => {
+                setTcSignatureStyle((val) => {
+                  return {
+                    ...val,
+                    x: e.currentTarget.x(),
+                    y: e.currentTarget.y(),
+                  };
+                });
+                console.log(e.currentTarget.x());
+              }}
+              scaleX={tcSignatureImageStyle.scale}
+              scaleY={tcSignatureImageStyle.scale}
+              draggable
+              src={tcSignatureImage}
             ></URLImage>
           )}
           <Text
