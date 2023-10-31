@@ -207,13 +207,17 @@ export default function Home() {
   useEffect(() => {
     if (profileImages.length !== 0 && dataSheet.length !== 0) {
       const profileFromName = profileImages.filter((val) => {
-        return (
-          val.name.split(".")[0].toLocaleUpperCase().toString().trim() ==
-          dataSheet[index][studentNameIndex.last ?? 0]
-            .toString()
-            .toLocaleUpperCase()
-            .trim()
-        );
+        return val.name
+          .split(".")[0]
+          .toLocaleUpperCase()
+          .toString()
+          .trim()
+          .includes(
+            dataSheet[index][studentNameIndex.last ?? 0]
+              .toString()
+              .toLocaleUpperCase()
+              .trim()
+          );
       });
       if (profileFromName.length !== 0) {
         const imageUrl = URL.createObjectURL(profileFromName[0]);
@@ -226,13 +230,17 @@ export default function Home() {
   useEffect(() => {
     if (signatureImages.length !== 0 && dataSheet.length !== 0) {
       const signatureFromName = signatureImages.filter((val) => {
-        return (
-          val.name.split(".")[0].toLocaleUpperCase().toString().trim() ==
-          dataSheet[index][studentNameIndex.last ?? 0]
-            .toString()
-            .toLocaleUpperCase()
-            .trim()
-        );
+        return val.name
+          .split(".")[0]
+          .toLocaleUpperCase()
+          .toString()
+          .trim()
+          .includes(
+            dataSheet[index][studentNameIndex.last ?? 0]
+              .toString()
+              .toLocaleUpperCase()
+              .trim()
+          );
       });
       if (signatureFromName.length !== 0) {
         const imageUrl = URL.createObjectURL(signatureFromName[0]);
@@ -244,11 +252,14 @@ export default function Home() {
   }, [signatureImages, index, studentNameIndex]);
   useEffect(() => {
     if (baseSheet.length !== 0) {
+      let gender = isMale ? "MALE" : "FEMALE";
+      let abbreviation = isMale ? "M" : "F";
+
       setDataSheet(
         baseSheet.filter((val) => {
           return (
-            (val[sexIndex] ?? "").toLocaleUpperCase() ==
-            (isMale ? "MALE" : "FEMALE")
+            (val[sexIndex] ?? "").toLocaleUpperCase() == gender ||
+            (val[sexIndex] ?? "").toLocaleUpperCase() == abbreviation
           );
         })
       );
@@ -256,6 +267,7 @@ export default function Home() {
   }, [isMale, baseSheet]);
   const generateImages = async () => {
     setIsGenerating(true);
+    console.log(dataSheet);
     if (stageRef.current !== null && !isDone) {
       if (index === dataSheet.length - 1) {
         console.log("done");
@@ -299,21 +311,25 @@ export default function Home() {
   };
 
   const onFileChange = async (evt: ChangeEvent<HTMLInputElement>) => {
-    if (evt.target.files !== null && evt.target.files.length !== 0) {
-      setIsCustomText(false);
-      setIndex(0);
-      setIsDone(false);
-      console.log(evt.target.files[0]);
-      const spreadsheet = read(await evt.target.files[0].arrayBuffer(), {
-        type: "buffer",
-      });
-      const worksheet = spreadsheet.Sheets[spreadsheet.SheetNames[0]];
-      const raw_data = utils
-        .sheet_to_json(worksheet, { header: 1 })
-        .filter((val: any) => val.length > 0);
-      console.log(raw_data);
-      setDataSheet(raw_data as string[][]);
-      setBaseSheet(raw_data as string[][]);
+    try {
+      if (evt.target.files !== null && evt.target.files.length !== 0) {
+        setIsCustomText(false);
+        setIndex(0);
+        setIsDone(false);
+        console.log(evt.target.files[0]);
+        const spreadsheet = read(await evt.target.files[0].arrayBuffer(), {
+          type: "buffer",
+        });
+        const worksheet = spreadsheet.Sheets[spreadsheet.SheetNames[0]];
+        const raw_data = utils
+          .sheet_to_json(worksheet, { header: 1 })
+          .filter((val: any) => val.length > 0);
+        console.log(raw_data);
+        setDataSheet(raw_data as string[][]);
+        setBaseSheet(raw_data as string[][]);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
   const cropperRef = useRef<CropperRef>(null);
