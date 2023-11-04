@@ -202,6 +202,7 @@ export default function IDCanvas(
               customText: suffix,
 
               defaultValue: "",
+              caps: true,
             })}`}
             fill="#fcffde"
             shadowBlur={25}
@@ -324,7 +325,9 @@ export default function IDCanvas(
               customText: guardian,
 
               caps: true,
-            })?.trim()}
+            })
+              ?.trim()
+              .toLocaleUpperCase()}
             width={1000}
             align="center"
             fontFamily="Noto Serif"
@@ -338,6 +341,7 @@ export default function IDCanvas(
               customText: contactNumber,
 
               defaultValue: "123456789",
+              caps: true,
             })}
             width={1000}
             align="center"
@@ -352,7 +356,8 @@ export default function IDCanvas(
               customText: address,
 
               defaultValue: "sapang bulak",
-            })}
+              caps: true,
+            })?.toLocaleUpperCase()}
             width={1000}
             align="center"
             fontFamily="Noto Serif"
