@@ -153,7 +153,7 @@ const Signature = () => {
         {sheet.length !== 0 ? sheet[index][lastNameIndex] : "Enter Spreadsheet"}
       </h1>
       <div className="flex flex-row w-sm items-center">
-        <Label>File Name: </Label>
+        <Label>File Name: (LAST NAME, FIRST NAME) </Label>
         <Input
           type="text"
           value={imageText}
