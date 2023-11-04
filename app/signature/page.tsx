@@ -240,6 +240,15 @@ const Signature = () => {
 
         <Button onClick={clear}>Clear</Button>
         {isBulk && <Button onClick={done}>Done</Button>}
+        <div className="ml-2 flex-col gap-2 ">
+          <Label>Bulk?</Label>
+          <Checkbox
+            checked={isBulk}
+            onCheckedChange={() => {
+              setIsBulk((state) => !state);
+            }}
+          ></Checkbox>
+        </div>
       </div>
       <div className="flex justify-center items-center gap-2 flex-wrap">
         {signatureImages.map((val, idx) => {
