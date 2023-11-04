@@ -29,7 +29,7 @@ const Signature = () => {
   const { signatureImages, addSignatureImage } = useSignatureStore();
   const [index, setIndex] = useState(0);
   const [isMale, setIsMale] = useState(true);
-  const [imageText, setImageText] = useState("Signature");
+  const [imageText, setImageText] = useState("ID Signature");
 
   const [screenSize, setScreenSize] = useState<{
     width: number | undefined;
@@ -41,6 +41,8 @@ const Signature = () => {
   const [sheet, setSheet] = useState<string[][]>([]);
   const [baseSheet, setBaseSheet] = useState<string[][]>([]);
   const [lastNameIndex, setLastNameIndex] = useState(0);
+  const [firstNameIndex, setFirstNameIndex] = useState(1);
+
   const [sexIndex, setSexIndex] = useState(8);
   const done = async () => {
     console.log("done");
@@ -52,7 +54,11 @@ const Signature = () => {
         blob,
         name:
           sheet.length !== 0
-            ? sheet[index][lastNameIndex].trim().toLocaleUpperCase()
+            ? `${sheet[index][lastNameIndex]
+                .trim()
+                .toLocaleUpperCase()}, ${sheet[index][firstNameIndex]
+                .trim()
+                .toLocaleUpperCase()}`
             : "Signature",
       });
       if (index < sheet.length - 1) {
@@ -146,10 +152,12 @@ const Signature = () => {
       <h1 className="font-bold text-2xl">
         {sheet.length !== 0 ? sheet[index][lastNameIndex] : "Enter Spreadsheet"}
       </h1>
-      <div className="flex flex-row w-sm">
+      <div className="flex flex-row w-sm items-center">
+        <Label>File Name: </Label>
         <Input
           type="text"
           value={imageText}
+          placeholder="Student Last Name"
           onChange={(e) => setImageText(e.target.value.toLocaleUpperCase())}
         ></Input>
       </div>
@@ -164,6 +172,12 @@ const Signature = () => {
                   "Last Name",
                   lastNameIndex,
                   setLastNameIndex,
+                  baseSheet
+                )}
+                {SelectField(
+                  "First Name",
+                  firstNameIndex,
+                  setFirstNameIndex,
                   baseSheet
                 )}
                 {SelectField("Sex", sexIndex, setSexIndex, baseSheet)}

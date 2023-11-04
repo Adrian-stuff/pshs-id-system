@@ -287,12 +287,17 @@ export default function Home() {
       addIdImage({
         blob,
         name:
-          setOr({
+          `${setOr({
             caps: true,
             customText: lastName,
             defaultValue: "ID Image",
             indexValue: studentNameIndex.last,
-          }) ?? "ID IMAGE",
+          })}, ${setOr({
+            caps: true,
+            customText: firstName,
+            defaultValue: "ID Image",
+            indexValue: studentNameIndex.first,
+          })}` ?? "ID IMAGE",
       });
 
       console.log(index, dataSheet.length);
