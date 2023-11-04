@@ -153,9 +153,13 @@ const Signature = () => {
           </Button>
         )}
       </div>
-      <h1 className="font-bold text-2xl">
-        {sheet.length !== 0 ? sheet[index][lastNameIndex] : "Enter Spreadsheet"}
-      </h1>
+      {isBulk && (
+        <h1 className="font-bold text-2xl">
+          {sheet.length !== 0
+            ? sheet[index][lastNameIndex]
+            : "Enter Spreadsheet"}
+        </h1>
+      )}
       <div className="flex flex-row w-sm items-center">
         <Label>File Name: (LAST NAME, FIRST NAME) </Label>
         <Input
@@ -165,51 +169,53 @@ const Signature = () => {
           onChange={(e) => setImageText(e.target.value.toLocaleUpperCase())}
         ></Input>
       </div>
-      <Accordion className="mt-[-20px] pb-[-15px]" type="single" collapsible>
-        <AccordionItem value="Open">
-          <AccordionTrigger>Open Input</AccordionTrigger>
+      {isBulk && (
+        <Accordion className="mt-[-20px] pb-[-15px]" type="single" collapsible>
+          <AccordionItem value="Open">
+            <AccordionTrigger>Open Input</AccordionTrigger>
 
-          <AccordionContent>
-            {sheet.length !== 0 && (
-              <div>
-                {SelectField(
-                  "Last Name",
-                  lastNameIndex,
-                  setLastNameIndex,
-                  baseSheet
-                )}
-                {SelectField(
-                  "First Name",
-                  firstNameIndex,
-                  setFirstNameIndex,
-                  baseSheet
-                )}
-                {SelectField("Sex", sexIndex, setSexIndex, baseSheet)}
+            <AccordionContent>
+              {sheet.length !== 0 && (
+                <div>
+                  {SelectField(
+                    "Last Name",
+                    lastNameIndex,
+                    setLastNameIndex,
+                    baseSheet
+                  )}
+                  {SelectField(
+                    "First Name",
+                    firstNameIndex,
+                    setFirstNameIndex,
+                    baseSheet
+                  )}
+                  {SelectField("Sex", sexIndex, setSexIndex, baseSheet)}
+                </div>
+              )}
+              {sheet.length !== 0 && (
+                <div>
+                  <Label>Male</Label>
+                  <Checkbox
+                    checked={isMale}
+                    onCheckedChange={() => {
+                      setIsMale((state) => !state);
+                    }}
+                  ></Checkbox>
+                </div>
+              )}
+              <div className="flex flex-row gap-2">
+                <Input
+                  type="file"
+                  name="data"
+                  id="data"
+                  onChange={onFileChange}
+                  accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                />
               </div>
-            )}
-            {sheet.length !== 0 && (
-              <div>
-                <Label>Male</Label>
-                <Checkbox
-                  checked={isMale}
-                  onCheckedChange={() => {
-                    setIsMale((state) => !state);
-                  }}
-                ></Checkbox>
-              </div>
-            )}
-            <div className="flex flex-row gap-2">
-              <Input
-                type="file"
-                name="data"
-                id="data"
-                onChange={onFileChange}
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
 
       {screenSize.width !== undefined ? (
         <div className="flex items-center">
