@@ -156,7 +156,7 @@ const Signature = () => {
       {isBulk && (
         <h1 className="font-bold text-2xl">
           {sheet.length !== 0
-            ? sheet[index][lastNameIndex]
+            ? `${sheet[index][lastNameIndex]}, ${sheet[index][firstNameIndex]}`
             : "Enter Spreadsheet"}
         </h1>
       )}
@@ -240,7 +240,7 @@ const Signature = () => {
 
         <Button onClick={clear}>Clear</Button>
         {isBulk && <Button onClick={done}>Done</Button>}
-        <div className="ml-2 flex-col gap-2 ">
+        <div className="ml-2 flex flex-col gap-1  ">
           <Label>Bulk?</Label>
           <Checkbox
             checked={isBulk}
