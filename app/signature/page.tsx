@@ -29,6 +29,8 @@ const Signature = () => {
   const { signatureImages, addSignatureImage } = useSignatureStore();
   const [index, setIndex] = useState(0);
   const [isMale, setIsMale] = useState(true);
+  const [isBulk, setIsBulk] = useState(false);
+
   const [imageText, setImageText] = useState("ID Signature");
 
   const [screenSize, setScreenSize] = useState<{
@@ -145,9 +147,11 @@ const Signature = () => {
     <div className="flex flex-col items-center justify-center gap-2">
       <div className="flex flex-row items-center justify-center gap-2">
         <h1 className="font-bold text-3xl">Signature</h1>
-        <Button className="" onClick={download}>
-          Download all
-        </Button>
+        {isBulk && (
+          <Button className="" onClick={download}>
+            Download all
+          </Button>
+        )}
       </div>
       <h1 className="font-bold text-2xl">
         {sheet.length !== 0 ? sheet[index][lastNameIndex] : "Enter Spreadsheet"}
@@ -229,7 +233,7 @@ const Signature = () => {
         </Button>
 
         <Button onClick={clear}>Clear</Button>
-        <Button onClick={done}>Done</Button>
+        {isBulk && <Button onClick={done}>Done</Button>}
       </div>
       <div className="flex justify-center items-center gap-2 flex-wrap">
         {signatureImages.map((val, idx) => {
