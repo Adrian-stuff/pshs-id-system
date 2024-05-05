@@ -12,7 +12,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <title>PSHS Layouting System</title>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>contact adrian de vera for the id layouting system. email: twoadrian6@gnmail.com</body>
     </html>
   );
 }
